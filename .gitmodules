@@ -1,0 +1,12 @@
+[submodule "3rdparty/QXlsx"]
+	path = 3rdparty/QXlsx
+	url = git@github.com:DoraFox/QXlsx.git
+[submodule "3rdparty/Poco"]
+	path = 3rdparty/Poco
+	url = git@github.com:DoraFox/Poco.git
+[submodule "3rdparty/QCoro"]
+	path = 3rdparty/QCoro
+	url = git@github.com:danvratil/qcoro.git
+[submodule "3rdparty/Asio"]
+	path = 3rdparty/Asio
+	url = git@github.com:chriskohlhoff/asio.git

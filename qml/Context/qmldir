@@ -1,0 +1,8 @@
+﻿module Singleton
+
+singleton Context     1.0 Context.qml
+singleton ColorConst  1.0 ColorConst.qml
+singleton FontConst   1.0 FontConst.qml
+singleton FontIcon    1.0 FontIcon.qml
+singleton SizeConst   1.0 SizeConst.qml
+singleton StringConst 1.0 StringConst.qml

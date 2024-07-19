@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Function/TestFunction.qml</file>
+        <file>Layout/LayoutBase.qml</file>
+        <file>Layout/MainWindow.qml</file>
+        <file>Widget/Button1.qml</file>
+        <file>Widget/ColorLabel.qml</file>
+        <file>Widget/ExcelTransform.qml</file>
+        <file>Widget/SwapMouseButton.qml</file>
+        <file>Context/qmldir</file>
+        <file>Context/ColorConst.qml</file>
+        <file>Context/FontConst.qml</file>
+        <file>Context/FontIcon.qml</file>
+        <file>Context/SizeConst.qml</file>
+        <file>Screen/LoginWindow.qml</file>
+        <file>Function/TestWidget.qml</file>
+        <file>Layout/MainWindow2.qml</file>
+        <file>HotReload/hot_reload_widget.qml</file>
+    </qresource>
+</RCC>

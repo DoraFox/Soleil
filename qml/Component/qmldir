@@ -1,0 +1,7 @@
+module Component
+
+Button_HotReload 1.0 Button_HotReload.qml
+Button_Normal    1.0 Button_Normal.qml
+ComboBox_Custom    1.0 ComboBox_Custom.qml
+
+depends Context 1.0
