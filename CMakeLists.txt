@@ -170,6 +170,9 @@ target_link_libraries(Soleil
 target_compile_options(Soleil
     PUBLIC
     -DASIO_STANDALONE
+    -Wall
+    -W
+    -g
 )
 
 set_target_properties(Soleil PROPERTIES
