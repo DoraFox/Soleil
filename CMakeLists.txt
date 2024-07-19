@@ -75,8 +75,8 @@ file(GLOB_RECURSE PROJECT_SOURCES
 message(${PROJECT_SOURCES})
 
 file(GLOB_RECURSE QML_SOURCES
-    *.qml
-    qmldir
+    qml/*.qml
+    qml/qmldir
 )
 
 set(TS_FILES
@@ -94,6 +94,7 @@ qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/qml ${TS_FILES} OPTIONS -no-
 set(QCORO_BUILD_EXAMPLES FALSE)
 set(BUILD_TESTING FALSE)
 add_subdirectory(3rdparty/QCoro)
+add_subdirectory(3rdparty/QXlsx/QXlsx)
 
 add_executable(Soleil
     ${PROJECT_HEADERS}
@@ -108,13 +109,13 @@ target_include_directories(Soleil
     ${POCO_PATH}/header
     ${ASIO_PATH}/include
     ${QCORO_PATH}/qcoro
-    ${QXLSX_PATH}/header
+    #${QXLSX_PATH}/QXlsx/header
 )
 
 target_link_directories(Soleil
     PUBLIC
     ${POCO_PATH}/lib
-    ${QXLSX_PATH}/lib
+    #${QXLSX_PATH}/lib
     ${DLL_PATH}/x64
     ${CMAKE_BINARY_DIR}/dll/x64
 )
@@ -132,7 +133,7 @@ endif()
 target_link_libraries(Soleil
     PUBLIC
     -lPocoFoundation
-    -lQXlsx
+    #-lQXlsx
     -lBinlog
     -lPLinApi
     QCoro${QT_VERSION_MAJOR}Core
@@ -142,6 +143,7 @@ target_link_libraries(Soleil
     -static-libgcc
     -static-libstdc++
     -dynamic
+    QXlsx::QXlsx
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Quick
     Qt${QT_VERSION_MAJOR}::Sql

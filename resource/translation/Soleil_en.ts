@@ -4,7 +4,7 @@
 <context>
     <name>Button_HotReload</name>
     <message>
-        <location filename="../../qml/Component/Button_HotReload.qml" line="9"/>
+        <location filename="../../qml/Component/Button_HotReload.qml" line="10"/>
         <source>_T1007</source>
         <translation>Hot Reloading!!!</translation>
     </message>
@@ -20,22 +20,22 @@
 <context>
     <name>ExcelTransform</name>
     <message>
-        <location filename="../../qml/Widget/ExcelTransform.qml" line="79"/>
+        <location filename="../../qml/Widget/ExcelTransform.qml" line="80"/>
         <source>_T1005</source>
         <translation>convert Execl to TS</translation>
     </message>
     <message>
-        <location filename="../../qml/Widget/ExcelTransform.qml" line="84"/>
+        <location filename="../../qml/Widget/ExcelTransform.qml" line="85"/>
         <source>_T1006</source>
         <translation>Update program translations</translation>
     </message>
     <message>
-        <location filename="../../qml/Widget/ExcelTransform.qml" line="97"/>
+        <location filename="../../qml/Widget/ExcelTransform.qml" line="98"/>
         <source>_T0002</source>
         <translation>中文</translation>
     </message>
     <message>
-        <location filename="../../qml/Widget/ExcelTransform.qml" line="104"/>
+        <location filename="../../qml/Widget/ExcelTransform.qml" line="105"/>
         <source>_T0003</source>
         <translation>English</translation>
     </message>
@@ -43,17 +43,17 @@
 <context>
     <name>SwapMouseButton</name>
     <message>
-        <location filename="../../qml/Widget/SwapMouseButton.qml" line="56"/>
+        <location filename="../../qml/Widget/SwapMouseButton.qml" line="57"/>
         <source>_T1000</source>
         <translation>primary mouse button</translation>
     </message>
     <message>
-        <location filename="../../qml/Widget/SwapMouseButton.qml" line="75"/>
+        <location filename="../../qml/Widget/SwapMouseButton.qml" line="76"/>
         <source>_T1001</source>
         <translation>left key</translation>
     </message>
     <message>
-        <location filename="../../qml/Widget/SwapMouseButton.qml" line="90"/>
+        <location filename="../../qml/Widget/SwapMouseButton.qml" line="91"/>
         <source>_T1002</source>
         <translation>right key</translation>
     </message>
@@ -61,8 +61,8 @@
 <context>
     <name>hot_reload_widget</name>
     <message>
-        <location filename="../../qml/HotReload/hot_reload_widget.qml" line="15"/>
-        <location filename="../../qml/HotReload/hot_reload_widget.qml" line="24"/>
+        <location filename="../../qml/HotReload/hot_reload_widget.qml" line="16"/>
+        <location filename="../../qml/HotReload/hot_reload_widget.qml" line="25"/>
         <source>_T1007</source>
         <translation>Hot Reloading!!!</translation>
     </message>

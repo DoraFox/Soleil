@@ -1,8 +1,8 @@
 ﻿#ifndef EXCELOPERATE_H
 #define EXCELOPERATE_H
 
-#include <QXlsx/xlsxdocument.h>
-#include <QXlsx/xlsxworkbook.h>
+#include <xlsxdocument.h>
+#include <xlsxworkbook.h>
 
 #include <QObject>
 #include <QDebug>
