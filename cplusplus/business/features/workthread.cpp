@@ -2,10 +2,12 @@
 
 #include <midware/define/basedefine.h>
 
+#ifdef Q_OS_WIN
 #include <profileapi.h>
 #include <synchapi.h>
 #include <winnt.h>
-
+#include <winsock2.h>
+#endif
 
 #include <chrono>
 #include <thread>
@@ -14,7 +16,7 @@
 
 using namespace std::chrono;
 
-#include <winsock2.h>
+
 #define BUFFER_SIZE 2048
 #define TEST_TIMES 10
 #define Interval_Microseconds 5000
@@ -43,6 +45,7 @@ void Precision_sleep_for()
            __FUNCTION__, Interval_Microseconds, total_used / TEST_TIMES);
 }
 
+#ifdef Q_OS_WIN
 void test()
 {
     LARGE_INTEGER litmp = {0};
@@ -83,6 +86,7 @@ void test2()
 
     DEBUGPREFIX << QString::number(time, 'f', 16) << QThread::currentThreadId();
 }
+#endif
 
 
 WorkThread::WorkThread(QObject *parent)

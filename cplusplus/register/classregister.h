@@ -21,11 +21,14 @@ class FileOperate;
 class TextOperate;
 class TestOperate;
 class NetworkOperate;
-class CANOperate;
 class S19Manager;
 class CCPCalibration;
-class LogFileOpt;
+
+#ifdef Q_OS_WIN
 class LinManager;
+class CANOperate;
+class LogFileOpt;
+#endif
 
 class ClassRegister : public QObject
 {
@@ -68,8 +71,6 @@ private:
     DECLARE_PROPERTY(TranslationManager*, translationMgr)
     DECLARE_PROPERTY(LayoutManager*, layoutMgr)
     DECLARE_PROPERTY(NetworkManager*, networkMgr)
-    DECLARE_PROPERTY(LinManager*, linMgr)
-
 
     DECLARE_PROPERTY(MainWindowControl*, mainWindowCtl)
 
@@ -79,10 +80,15 @@ private:
     DECLARE_PROPERTY(TextOperate*, textOpt)
 
     DECLARE_PROPERTY(TestOperate*, testOpt)
-    DECLARE_PROPERTY(CANOperate*, canOpt)
+
     DECLARE_PROPERTY(CCPCalibration*, ccpCal)
     DECLARE_PROPERTY(S19Manager*, s19Mgr)
+
+#ifdef Q_OS_WIN
+    DECLARE_PROPERTY(LinManager*, linMgr)
+    DECLARE_PROPERTY(CANOperate*, canOpt)
     DECLARE_PROPERTY(LogFileOpt*, logFileOpt)
+#endif
 
 };
 

@@ -72,6 +72,22 @@ file(GLOB_RECURSE PROJECT_SOURCES
     resource/icon.rc
     cplusplus/*.cpp
 )
+
+if(NOT DEFINED WIN32)
+    file(GLOB_RECURSE REMOVE_HEADERS
+        cplusplus/business/can/*.h
+        cplusplus/business/lin/*.h
+    )
+
+    file(GLOB_RECURSE REMOVE_SOURCES
+        cplusplus/business/can/*.cpp
+        cplusplus/business/lin/*.cpp
+    )
+
+    list(REMOVE_ITEM PROJECT_HEADERS ${REMOVE_HEADERS})
+    list(REMOVE_ITEM PROJECT_SOURCES ${REMOVE_SOURCES})
+endif()
+
 message(${PROJECT_SOURCES})
 
 file(GLOB_RECURSE QML_SOURCES
@@ -127,6 +143,8 @@ if(WIN32)
         -lws2_32
         -lUser32
         -lwinmm
+        -lBinlog
+        -lPLinApi
     )
 endif()
 
@@ -134,8 +152,6 @@ target_link_libraries(Soleil
     PUBLIC
     -lPocoFoundation
     #-lQXlsx
-    -lBinlog
-    -lPLinApi
     QCoro${QT_VERSION_MAJOR}Core
     QCoro${QT_VERSION_MAJOR}Network
 

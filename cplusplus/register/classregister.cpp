@@ -15,10 +15,13 @@
 #include "business/features/testoperate.h"
 #include "business/calibration/s19/s19manager.h"
 
-#include "business/can/canoperate.h"
 #include "business/calibration/ccpcalibration.h"
-#include "business/can/logfileopt.h"
+
+#ifdef Q_OS_WIN
 #include "business/lin/linmanager.h"
+#include "business/can/canoperate.h"
+#include "business/can/logfileopt.h"
+#endif
 
 ClassRegister* ClassRegister::m_instance = nullptr;
 
@@ -34,11 +37,14 @@ ClassRegister::ClassRegister(EnhancedQmlApplicationEngine *engine, QObject *pare
     , m_fileOpt(nullptr)
     , m_textOpt(nullptr)
     , m_testOpt(nullptr)
-    , m_canOpt(nullptr)
     , m_ccpCal(nullptr)
     , m_s19Mgr(nullptr)
-    , m_logFileOpt(nullptr)
+
+#ifdef Q_OS_WIN
+    , m_canOpt(nullptr)
     , m_linMgr(nullptr)
+    , m_logFileOpt(nullptr)
+#endif
 {
     m_instance = this;
 }
@@ -85,16 +91,20 @@ void ClassRegister::registerClass()
     m_translationMgr = new TranslationManager(this);
     m_layoutMgr = new LayoutManager(m_engine, this);
     m_networkMgr = new NetworkManager(this);
+
+#ifdef Q_OS_WIN
     m_linMgr = new LinManager(this);
+    m_canOpt = new CANOperate(this);
+    m_logFileOpt = new LogFileOpt(this);
+#endif
 
     m_mainWindowCtl = new MainWindowControl(this);
     m_fileOpt = new FileOperate(this);
     m_textOpt = new TextOperate(this);
     m_testOpt = new TestOperate(this);
-    m_canOpt = new CANOperate(this);
+
     m_ccpCal = new CCPCalibration(this);
     m_s19Mgr = new S19Manager(this);
-    m_logFileOpt = new LogFileOpt(this);
 
     connect(m_layoutMgr, &LayoutManager::qmlMainWindowCreated, this, [&]()
     {
@@ -114,7 +124,10 @@ void ClassRegister::registerType()
 //    RegisterQmlType(LayoutManager, 1, 0);
     RegisterQmlType(NetworkOperate, 1, 0);
     RegisterQmlType(NetworkManager, 1, 0);
+
+#ifdef Q_OS_WIN
     RegisterQmlType(LogFileOpt, 1, 0);
+#endif
 }
 
 void ClassRegister::registerContext()
@@ -135,16 +148,20 @@ void ClassRegister::registerContext()
     ptrContext->setContextProperty("funcMgr", m_systemSettings);
     ptrContext->setContextProperty("translationMgr", m_translationMgr);
     ptrContext->setContextProperty("layoutMgr", m_layoutMgr);
-    ptrContext->setContextProperty("linMgr", m_linMgr);
 
     ptrContext->setContextProperty("mainWindowCtl", m_mainWindowCtl);
     ptrContext->setContextProperty("fileOpt", m_fileOpt);
     ptrContext->setContextProperty("textOpt", m_textOpt);
     ptrContext->setContextProperty("testOpt", m_testOpt);
-    ptrContext->setContextProperty("canOpt", m_canOpt);
     ptrContext->setContextProperty("networkMgr", m_networkMgr);
     ptrContext->setContextProperty("s19Mgr", m_s19Mgr);
+
+
+#ifdef Q_OS_WIN
+    ptrContext->setContextProperty("linMgr", m_linMgr);
+    ptrContext->setContextProperty("canOpt", m_canOpt);
     ptrContext->setContextProperty("logFileOpt", m_logFileOpt);
+#endif
 
 #else
 
