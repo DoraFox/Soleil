@@ -12,7 +12,7 @@ FileOperate::FileOperate(QObject *parent)
 
 }
 
-void FileOperate::transformQMLConnection(const QUrl &url, bool recursive)
+void FileOperate::transformQMLConnection(const QUrl &url, bool /*recursive*/)
 {
     // Connections{}  5.12 -> 5.15
 

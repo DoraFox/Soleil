@@ -18,7 +18,7 @@ public:
 
     Q_INVOKABLE QString getDirectoryAbsolutePath(QString path);
 
-    const char convertU82Char(uint8_t value);
+    char convertU82Char(uint8_t value);
 
 
 public slots:

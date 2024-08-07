@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Soleil VERSION 0.1 LANGUAGES CXX)
+project(Soleil VERSION 0.1 LANGUAGES C CXX)
 
 #set(CMAKE_PREFIX_PATH "C:/Qt/5.15.2/mingw81_64")
 
@@ -17,8 +17,8 @@ set(CMAKE_CXX_FLAGS -fcoroutines)
 # option(QCORO_BUILD_EXAMPLES "Build examples" ON)
 # add_feature_info(Examples QCORO_BUILD_EXAMPLES "Build examples")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Sql LinguistTools Svg SerialBus)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql LinguistTools Svg SerialBus)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus )
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus )
 
 set(POCO_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/Poco)
 set(CPP_PATH   ${CMAKE_SOURCE_DIR}/cplusplus)
@@ -27,6 +27,8 @@ set(ASIO_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/Asio)
 set(QCORO_PATH ${CMAKE_SOURCE_DIR}/3rdparty/QCoro)
 set(QXLSX_PATH ${CMAKE_SOURCE_DIR}/3rdparty/QXlsx)
 set(DLL_PATH   ${CMAKE_SOURCE_DIR}/dll)
+set(GLAD_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glad)
+set(GLFW_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glfw-3.3.6.bin.WIN64)
 
 #set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
 set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
@@ -62,18 +64,23 @@ add_compile_definitions(
 
     IMAGE_RELATIVE_PATH=${IMAGE_RELATIVE_PATH}
     APP_ICON_NAME=${APP_ICON_NAME}
+
+    GLFW_DLL
 )
 
 file(GLOB_RECURSE PROJECT_HEADERS
     cplusplus/*.h
+    ${GLAD_PATH}/*.h
 )
 
 file(GLOB_RECURSE PROJECT_SOURCES
+    ${GLAD_PATH}/*.c
     resource/icon.rc
     cplusplus/*.cpp
 )
 
-if(NOT DEFINED WIN32)
+set(USE_CAN_LIN FALSE)
+if(NOT USE_CAN_LIN)
     file(GLOB_RECURSE REMOVE_HEADERS
         cplusplus/business/can/*.h
         cplusplus/business/lin/*.h
@@ -126,6 +133,8 @@ target_include_directories(Soleil
     ${ASIO_PATH}/include
     ${QCORO_PATH}/qcoro
     #${QXLSX_PATH}/QXlsx/header
+    ${GLAD_PATH}/include
+    ${GLFW_PATH}/include
 )
 
 target_link_directories(Soleil
@@ -134,6 +143,7 @@ target_link_directories(Soleil
     #${QXLSX_PATH}/lib
     ${DLL_PATH}/x64
     ${CMAKE_BINARY_DIR}/dll/x64
+    ${GLFW_PATH}/lib-mingw-w64
 )
 
 if(WIN32)
@@ -143,6 +153,13 @@ if(WIN32)
         -lws2_32
         -lUser32
         -lwinmm
+        -lglfw3dll
+    )
+endif()
+
+if(USE_CAN_LIN)
+    target_link_libraries(Soleil
+        PUBLIC
         -lBinlog
         -lPLinApi
     )
@@ -152,6 +169,7 @@ target_link_libraries(Soleil
     PUBLIC
     -lPocoFoundation
     #-lQXlsx
+    Qt${QT_VERSION_MAJOR}::Concurrent
     QCoro${QT_VERSION_MAJOR}Core
     QCoro${QT_VERSION_MAJOR}Network
 
@@ -160,11 +178,11 @@ target_link_libraries(Soleil
     -static-libstdc++
     -dynamic
     QXlsx::QXlsx
-    Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Quick
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Svg
     Qt${QT_VERSION_MAJOR}::SerialBus
+
 )
 
 target_compile_options(Soleil

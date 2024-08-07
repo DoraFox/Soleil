@@ -61,7 +61,7 @@ void TranslationManager::translateProject(const QUrl &url)
     }
 }
 
-bool TranslationManager::translateProFile(QString command)
+bool TranslationManager::translateProFile(QString /*command*/)
 {
     QProcess process;
     QStringList arguments;

@@ -72,6 +72,7 @@ TestOperate::TestOperate(QObject *parent)
     , m_enabled(true)
 {
     MyServer* server = new MyServer{QHostAddress::LocalHost, 6666};
+    Q_UNUSED(server)
     //MyClient* client = new MyClient{QHostAddress::LocalHost, 6666};
 }
 
@@ -93,7 +94,7 @@ void TestOperate::definedFunc()
                 << __LINE__
         ;
 }
-
+/*
 void variable_test()
 {
     int aaa = 0x12345678;
@@ -119,7 +120,7 @@ void variable_test()
 
     DEBUGPREFIX << Qt::hex << data;
 }
-
+*/
 void fun_ref(int (&p)[7])
 {
     // Printing size of array

@@ -27,11 +27,14 @@ QQuickItem *LayoutManager::getLayout(int layoutLevel)
 
 void LayoutManager::loadMainQML()
 {
-    QObject::connect(m_engine, &QQmlApplicationEngine::objectCreated,
-                     this, &LayoutManager::onQMLObjectCreated,
-                     Qt::QueuedConnection);
+    if(m_engine)
+    {
+        QObject::connect(m_engine, &QQmlApplicationEngine::objectCreated,
+                         this, &LayoutManager::onQMLObjectCreated,
+                         Qt::QueuedConnection);
 
-    m_engine->load(m_mainURL);
+        m_engine->load(m_mainURL);
+    }
 }
 
 QQuickWindow *LayoutManager::getMainWindow() const

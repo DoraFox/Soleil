@@ -43,7 +43,7 @@ QString Dandelion::getDirectoryAbsolutePath(QString path)
     return path;
 }
 
-const char Dandelion::convertU82Char(uint8_t value)
+char Dandelion::convertU82Char(uint8_t value)
 {
     static const char numberArray[] = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

@@ -16,8 +16,9 @@
 #include "business/calibration/s19/s19manager.h"
 
 #include "business/calibration/ccpcalibration.h"
+#include "business/opengl/learnopengl.h"
 
-#ifdef Q_OS_WIN
+#ifdef USE_CAN_LIN
 #include "business/lin/linmanager.h"
 #include "business/can/canoperate.h"
 #include "business/can/logfileopt.h"
@@ -39,8 +40,8 @@ ClassRegister::ClassRegister(EnhancedQmlApplicationEngine *engine, QObject *pare
     , m_testOpt(nullptr)
     , m_ccpCal(nullptr)
     , m_s19Mgr(nullptr)
-
-#ifdef Q_OS_WIN
+    , m_learnopengl(nullptr)
+#ifdef USE_CAN_LIN
     , m_canOpt(nullptr)
     , m_linMgr(nullptr)
     , m_logFileOpt(nullptr)
@@ -89,10 +90,10 @@ void ClassRegister::registerClass()
     m_excelOpt = new ExcelOperate(this);
     m_systemSettings = new SystemSettings(this);
     m_translationMgr = new TranslationManager(this);
-    m_layoutMgr = new LayoutManager(m_engine, this);
     m_networkMgr = new NetworkManager(this);
 
-#ifdef Q_OS_WIN
+    m_learnopengl = new LearnOpengl(this);
+#ifdef USE_CAN_LIN
     m_linMgr = new LinManager(this);
     m_canOpt = new CANOperate(this);
     m_logFileOpt = new LogFileOpt(this);
@@ -106,13 +107,17 @@ void ClassRegister::registerClass()
     m_ccpCal = new CCPCalibration(this);
     m_s19Mgr = new S19Manager(this);
 
-    connect(m_layoutMgr, &LayoutManager::qmlMainWindowCreated, this, [&]()
+    if(m_engine)
     {
-        m_mainWindowCtl->set_mainWindow(m_layoutMgr->getMainWindow());
-        m_layoutMgr->initLayout();
-    });
+        m_layoutMgr = new LayoutManager(m_engine, this);
+        connect(m_layoutMgr, &LayoutManager::qmlMainWindowCreated, this, [&]()
+                {
+                    m_mainWindowCtl->set_mainWindow(m_layoutMgr->getMainWindow());
+                    m_layoutMgr->initLayout();
+                });
 
-    connect(this, &ClassRegister::finishRegister, m_layoutMgr, &LayoutManager::loadMainQML);
+        connect(this, &ClassRegister::finishRegister, m_layoutMgr, &LayoutManager::loadMainQML);
+    }
 }
 
 void ClassRegister::registerType()
@@ -125,13 +130,18 @@ void ClassRegister::registerType()
     RegisterQmlType(NetworkOperate, 1, 0);
     RegisterQmlType(NetworkManager, 1, 0);
 
-#ifdef Q_OS_WIN
+#ifdef USE_CAN_LIN
     RegisterQmlType(LogFileOpt, 1, 0);
 #endif
 }
 
 void ClassRegister::registerContext()
 {
+    if(nullptr == m_engine)
+    {
+        return;
+    }
+
     QQmlContext* ptrContext = m_engine->rootContext();
 
     ComponentRegister::RegistQMLComponent(ptrContext);
@@ -157,7 +167,7 @@ void ClassRegister::registerContext()
     ptrContext->setContextProperty("s19Mgr", m_s19Mgr);
 
 
-#ifdef Q_OS_WIN
+#ifdef USE_CAN_LIN
     ptrContext->setContextProperty("linMgr", m_linMgr);
     ptrContext->setContextProperty("canOpt", m_canOpt);
     ptrContext->setContextProperty("logFileOpt", m_logFileOpt);

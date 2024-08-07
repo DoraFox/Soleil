@@ -10,6 +10,8 @@
 Q_DECLARE_LOGGING_CATEGORY(testlog)
 Q_LOGGING_CATEGORY(testlog, "testlog")
 
+#define NOT_SHOW_QML
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL); // 解决QML 窗口缩小放大时闪烁的问题
@@ -22,11 +24,16 @@ int main(int argc, char *argv[])
     DEBUGPREFIX << "C++:" << __cplusplus;
 
     EnhancedQmlApplicationEngine engine;
+#ifdef NOT_SHOW_QML
+    ClassRegister classRegister(nullptr);
+#else
     ClassRegister classRegister(&engine);
-    classRegister.initial();
     QObject::connect(&app, &QCoreApplication::aboutToQuit, classRegister.layoutMgr(), &LayoutManager::deleteAllLayout);
+#endif
+    classRegister.initial();
 
-    DEBUGPREFIX << TRANSLATION_PATH_ZH << _STR(APP_ICON_NAME) << APP_ICON;
+    //DEBUGPREFIX << TRANSLATION_PATH_ZH << _STR(APP_ICON_NAME) << APP_ICON;
     app.setWindowIcon(QIcon(APP_ICON));
+
     return app.exec();
 }

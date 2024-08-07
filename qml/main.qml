@@ -38,14 +38,7 @@ Window {
             console.log($msg, "Closing QML Application...")
             visible = false
             Qt.quit()
-            //idCloseTimer.start()
         }
     }
 
-    Timer {
-        id: idCloseTimer
-        onTriggered: {
-            layoutMgr.closingApplication()
-        }
-    }
 }

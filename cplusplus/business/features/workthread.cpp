@@ -48,7 +48,7 @@ void Precision_sleep_for()
 #ifdef Q_OS_WIN
 void test()
 {
-    LARGE_INTEGER litmp = {0};
+    LARGE_INTEGER litmp = {{0, 0}};
     LONGLONG startTime = 0;
     LONGLONG endTime = 0;
     double gap = 0;
@@ -69,7 +69,7 @@ void test()
 
 void test2()
 {
-    LARGE_INTEGER litmp = {0};
+    LARGE_INTEGER litmp = {{0, 0}};
     LONGLONG startTime = 0;
     LONGLONG endTime = 0;
     LONGLONG frequency = 0;

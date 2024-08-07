@@ -24,7 +24,9 @@ class NetworkOperate;
 class S19Manager;
 class CCPCalibration;
 
-#ifdef Q_OS_WIN
+class LearnOpengl;
+
+#ifdef USE_CAN_LIN
 class LinManager;
 class CANOperate;
 class LogFileOpt;
@@ -84,7 +86,9 @@ private:
     DECLARE_PROPERTY(CCPCalibration*, ccpCal)
     DECLARE_PROPERTY(S19Manager*, s19Mgr)
 
-#ifdef Q_OS_WIN
+    DECLARE_PROPERTY(LearnOpengl*, learnopengl)
+
+#ifdef USE_CAN_LIN
     DECLARE_PROPERTY(LinManager*, linMgr)
     DECLARE_PROPERTY(CANOperate*, canOpt)
     DECLARE_PROPERTY(LogFileOpt*, logFileOpt)

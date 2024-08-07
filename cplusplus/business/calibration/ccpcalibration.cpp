@@ -96,4 +96,5 @@ CCPCalibration::CCPCalibration(QObject *parent)
 
         ccp_test();
     };
+    Q_UNUSED(func)
 }
