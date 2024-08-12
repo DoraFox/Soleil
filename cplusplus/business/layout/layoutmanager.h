@@ -4,8 +4,6 @@
 #include <QObject>
 #include <midware/define/pathdefine.h>
 
-#include "cplusplus/midware/define/pathdefine.h"
-
 #include <QDebug>
 #include <QPair>
 #include <QUrl>

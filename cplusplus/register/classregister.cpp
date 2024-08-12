@@ -71,14 +71,6 @@ void ClassRegister::testFunction()
 
     m_systemSettings->testFunc();
 
-    /*
-    auto codeMap = m_translationMgr->ERROR_CODE;
-    qDebug() << codeMap.size() << codeMap.capacity();
-
-    foreach(auto value, codeMap)
-    {
-        qDebug() << value;
-    }*/
 #ifdef Q_OS_LINUX
     system("sync");
 #endif
@@ -92,7 +84,7 @@ void ClassRegister::registerClass()
     m_translationMgr = new TranslationManager(this);
     m_networkMgr = new NetworkManager(this);
 
-    m_learnopengl = new LearnOpengl(this);
+    //m_learnopengl = new LearnOpengl(this);
 #ifdef USE_CAN_LIN
     m_linMgr = new LinManager(this);
     m_canOpt = new CANOperate(this);
@@ -123,10 +115,10 @@ void ClassRegister::registerClass()
 void ClassRegister::registerType()
 {
     RegisterQmlType(Dandelion, 1, 0);
-//    RegisterQmlType(ExcelOperate, 1, 0);
-//    RegisterQmlType(SystemSettings, 1, 0);
+    RegisterQmlType(ExcelOperate, 1, 0);
+    RegisterQmlType(SystemSettings, 1, 0);
     RegisterQmlType(TranslationManager, 1, 0);
-//    RegisterQmlType(LayoutManager, 1, 0);
+    //RegisterQmlType(LayoutManager, 1, 0);
     RegisterQmlType(NetworkOperate, 1, 0);
     RegisterQmlType(NetworkManager, 1, 0);
 

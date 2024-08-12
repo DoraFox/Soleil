@@ -67,6 +67,44 @@ private:
     QTimer mTimer;
 };
 
+#include <stdio.h>
+#include <stdlib.h>
+
+// 定义包含柔性数组成员的结构体
+struct flexible_array {
+    int count;
+    int data[];  // 柔性数组成员
+};
+
+void flex_array()
+{
+    int n = 5;  // 数组大小
+    // 分配结构体和数组所需的内存
+    struct flexible_array *fa = (struct flexible_array *)malloc(sizeof(struct flexible_array) + n * sizeof(int));
+    if (fa == NULL) {
+        perror("malloc");
+        return;
+    }
+
+    DEBUGPREFIX << sizeof(struct flexible_array);
+
+    fa->count = n;
+    // 初始化数组成员
+    for (int i = 0; i < n; i++) {
+        fa->data[i] = i * 10;
+    }
+
+    // 打印数组成员
+    for (int i = 0; i < fa->count; i++) {
+        printf("data[%d] = %d\n", i, fa->data[i]);
+    }
+
+    // 释放分配的内存
+    free(fa);
+
+}
+
+
 TestOperate::TestOperate(QObject *parent)
     : QObject{parent}
     , m_enabled(true)
@@ -74,6 +112,7 @@ TestOperate::TestOperate(QObject *parent)
     MyServer* server = new MyServer{QHostAddress::LocalHost, 6666};
     Q_UNUSED(server)
     //MyClient* client = new MyClient{QHostAddress::LocalHost, 6666};
+
 }
 
 void TestOperate::qmlTestFunction()

@@ -4,13 +4,14 @@
 #include "register/classregister.h"
 #include "business/layout/layoutmanager.h"
 
+#include <QIcon>
 #include <QLoggingCategory>
 
 
 Q_DECLARE_LOGGING_CATEGORY(testlog)
 Q_LOGGING_CATEGORY(testlog, "testlog")
 
-#define NOT_SHOW_QML
+//#define NOT_SHOW_QML
 
 int main(int argc, char *argv[])
 {
@@ -28,11 +29,14 @@ int main(int argc, char *argv[])
     ClassRegister classRegister(nullptr);
 #else
     ClassRegister classRegister(&engine);
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, classRegister.layoutMgr(), &LayoutManager::deleteAllLayout);
 #endif
     classRegister.initial();
 
-    //DEBUGPREFIX << TRANSLATION_PATH_ZH << _STR(APP_ICON_NAME) << APP_ICON;
+#ifndef NOT_SHOW_QML
+    QObject::connect(&app, &QCoreApplication::aboutToQuit, classRegister.layoutMgr(), &LayoutManager::deleteAllLayout);
+#endif
+
+    DEBUGPREFIX << TRANSLATION_PATH_ZH << _STR(APP_ICON_NAME) << APP_ICON;
     app.setWindowIcon(QIcon(APP_ICON));
 
     return app.exec();

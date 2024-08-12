@@ -17,8 +17,8 @@ set(CMAKE_CXX_FLAGS -fcoroutines)
 # option(QCORO_BUILD_EXAMPLES "Build examples" ON)
 # add_feature_info(Examples QCORO_BUILD_EXAMPLES "Build examples")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus )
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus )
+find_package(QT NAMES Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus)
 
 set(POCO_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/Poco)
 set(CPP_PATH   ${CMAKE_SOURCE_DIR}/cplusplus)
@@ -107,11 +107,7 @@ set(TS_FILES
     ${TS_PATH}/${EN_NAME}.ts
 )
 
-set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${TM_PATH})
-
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/qml ${TS_FILES} OPTIONS -no-obsolete)
-
-#qt5_add_translation(qmFiles ${TS_FILES})
 
 # used in module QCoro
 set(QCORO_BUILD_EXAMPLES FALSE)
@@ -182,7 +178,6 @@ target_link_libraries(Soleil
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Svg
     Qt${QT_VERSION_MAJOR}::SerialBus
-
 )
 
 target_compile_options(Soleil
@@ -194,7 +189,7 @@ target_compile_options(Soleil
 )
 
 set_target_properties(Soleil PROPERTIES
-    WIN32_EXECUTABLE TRUE  # not show console window
+    WIN32_EXECUTABLE TRUE  #set TRUE for not show console window
 )
 
 install(TARGETS Soleil
@@ -203,7 +198,18 @@ install(TARGETS Soleil
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-file(COPY ${CMAKE_SOURCE_DIR}/${IMAGE_RELATIVE_PATH} DESTINATION ${CMAKE_BINARY_DIR}/${RESOURCE_RELATIVE_PATH})
-file(COPY ${DLL_PATH}/x64/ DESTINATION ${CMAKE_BINARY_DIR})
+file(
+    COPY
+    ${CMAKE_SOURCE_DIR}/${IMAGE_RELATIVE_PATH}
+    DESTINATION
+    ${CMAKE_BINARY_DIR}/${RESOURCE_RELATIVE_PATH}
+)
+
+file(
+    COPY
+    ${DLL_PATH}/x64/
+    DESTINATION
+    ${CMAKE_BINARY_DIR}
+)
 
 #MAIN_QML  ../Soleil/qml/main.qml

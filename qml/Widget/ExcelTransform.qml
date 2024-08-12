@@ -97,14 +97,14 @@ Rectangle {
         Button_Normal{
             text: qsTr("_T0002")
             onClicked: {
-                translationMgr.selectLanguage(TranslationManager.Translate_ZH)
+                translationMgr.selectLanguage(TranslationManager.Translate_Chinese)
             }
         }
 
         Button_Normal{
             text: qsTr("_T0003")
             onClicked: {
-                translationMgr.selectLanguage(TranslationManager.Translate_EN)
+                translationMgr.selectLanguage(TranslationManager.Translate_English)
             }
         }
 

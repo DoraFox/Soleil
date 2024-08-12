@@ -7,7 +7,7 @@ Loader {
     id: idLoader
 
     //source: "../HotReload/hot_reload_widget.qml"
-    source: "../Screen/LinWindow.qml"
+    source: "../Screen/TranslationWindow.qml"
 
     function reload()
     {
