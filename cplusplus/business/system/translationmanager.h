@@ -22,9 +22,6 @@
 
 #include <qcorotask.h>
 
-#define TRANSLATE(code) {code, QObject::tr(_TRANSLATE(_T ## code))}
-#define _TRANSLATE(code) #code
-
 class TranslationManager : public QObject
 {
     Q_OBJECT
@@ -34,16 +31,16 @@ class TranslationManager : public QObject
 
 public:
     typedef enum enumTranslateTitle: quint8{
-        Code = 1,
+        Translate_Code = 1,
         Translate_Chinese,
-        Translate_ChineseTw,
         Translate_English,
+        Translate_ChineseTw,
         Translate_French,
         Translate_Japanese,
 
         Translate_Auto,
 
-        ColumnBegin = Code + 1,
+        ColumnBegin = Translate_Code + 1,
         ColumnEnd = Translate_Auto + 1,
 
         Unknow
@@ -54,17 +51,14 @@ public:
 
     Q_INVOKABLE void selectLanguage(int type);
 
-    /* unused */
-    Q_INVOKABLE void translateProject(const QUrl& url);
-
-    Q_INVOKABLE bool translateProFile(QString command);
-
-    QCoro::Task<void> translateText(TransInfoHash& hash, TranslateTitle from, TranslateTitle to);
+    QCoro::Task<void> translateText(TranslateTitle from, TranslateTitle to);
 
     /* url: file path */
     Q_INVOKABLE void translateExcel(const QUrl& url);
 
-    QStringList extractSourceContentFromFile(const QString &fileName);
+    QStringList extractSourceContent(const QString &fileName);
+
+    QCoro::Task<void> delayOperation(int milliseconds);
 
 private:
     void initLanguage();
@@ -73,15 +67,15 @@ private:
 
     QString generateSign(const QString &q, const QString &salt, const QString &curtime);
 
-    bool getTransInfoHash(const QString &docPath);
+    bool getTransInfoHash(const QString &excelFilePath);
 
-    void writeTrans2Execl(const QUrl &url, TransInfoHash& hash);
-
-    QCoro::Task<> translateExcel_inter(QUrl url);
-
-    void convertExcelToTS(const QString &execlFileName, const QString &tsFileName, TranslateTitle type);
+    void writeTrans2Execl(const QString &excelFilePath);
 
     void writeToTranslationExcel(const QStringList &contents, const QString &fileName);
+
+    void updateTsFileByExecl(const QString& excelFilePath, const QString& tsFilePath, TranslateTitle language);
+
+    QCoro::Task<QString> translateWord(QUrl url);
 
 private slots:
 

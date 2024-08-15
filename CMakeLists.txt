@@ -17,8 +17,8 @@ set(CMAKE_CXX_FLAGS -fcoroutines)
 # option(QCORO_BUILD_EXAMPLES "Build examples" ON)
 # add_feature_info(Examples QCORO_BUILD_EXAMPLES "Build examples")
 
-find_package(QT NAMES Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus)
+find_package(QT NAMES Qt5 REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus Xml)
 
 set(POCO_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/Poco)
 set(CPP_PATH   ${CMAKE_SOURCE_DIR}/cplusplus)
@@ -107,6 +107,8 @@ set(TS_FILES
     ${TS_PATH}/${EN_NAME}.ts
 )
 
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${TM_PATH}) # set the output files(*.tm) in TM_PATH
+
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/qml ${TS_FILES} OPTIONS -no-obsolete)
 
 # used in module QCoro
@@ -166,6 +168,7 @@ target_link_libraries(Soleil
     -lPocoFoundation
     #-lQXlsx
     Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Xml
     QCoro${QT_VERSION_MAJOR}Core
     QCoro${QT_VERSION_MAJOR}Network
 

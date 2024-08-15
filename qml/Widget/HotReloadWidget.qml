@@ -6,8 +6,8 @@ import Context 1.0
 Loader {
     id: idLoader
 
-    //source: "../HotReload/hot_reload_widget.qml"
-    source: "../Screen/TranslationWindow.qml"
+    source: "../HotReload/hot_reload_widget.qml"
+
 
     function reload()
     {

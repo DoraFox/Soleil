@@ -20,7 +20,7 @@ Rectangle {
     FileDialog {
          id: idFileDialog
 
-         // 0: 转化Execl文件; 1: 自定义转换代码
+         // 0: 翻译Execl文件;
          readonly property var fileOpts:[0, 1]
 
          property int curOpt: -1
@@ -32,12 +32,12 @@ Rectangle {
              {
              case fileOpts[0]:
              {
-                //excelOpt.transformExecl(file)
+                translationMgr.translateExcel(file)
              }
                  break
              case fileOpts[1]:
              {
-                excelOpt.transformCode(file)
+
              }
                  break
              default:
@@ -49,7 +49,7 @@ Rectangle {
     FolderDialog{
         id: idFolderDialog
 
-        // 0: 将Execl文件转换为TS文件; 1:更新程序翻译
+        // 0: 将Execl文件转换为TS文件;
         readonly property var folderOpts:[0, 1]
 
         property int curOpt: -1
@@ -59,12 +59,12 @@ Rectangle {
             {
             case folderOpts[0]:
             {
-               excelOpt.convertExcelToTS(folder)
+
             }
                 break
             case folderOpts[1]:
             {
-               translationMgr.translateProject(folder)
+
             }
                 break
             default:
@@ -81,9 +81,9 @@ Rectangle {
             isFileOpt: false
         }
         ListElement{
-            opt: 1
-            name: qsTr("_T1006") //"更新程序翻译"
-            isFileOpt: false
+            opt: 0
+            name: qsTr("_T1003") //"翻译Execl文件"
+            isFileOpt: true
         }
     }
 
