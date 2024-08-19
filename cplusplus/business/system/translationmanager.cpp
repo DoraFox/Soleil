@@ -1,5 +1,6 @@
 ﻿#include "translationmanager.h"
 
+#include <QTranslator>
 #include <QUrlQuery>
 #include <QNetworkRequest>
 #include <QJsonDocument>
@@ -7,13 +8,17 @@
 #include <QJsonArray>
 #include <QCryptographicHash>
 #include <QRegularExpression>
-
 #include <QDomDocument>
+#include <QFile>
+
+#include <xlsxworkbook.h>
+#include <xlsxdocument.h>
 
 #include "qcorotask.h"
 #include "qcoronetworkreply.h"
 #include "qcorotimer.h"
 
+#include "register/classregister.h"
 #include <midware/define/pathdefine.h>
 
 const QString TranslationManager::TRANSLATE_APP_KEY = "";
@@ -22,8 +27,6 @@ const QString TranslationManager::TRANSLATE_APP_SECRET = "";
 using QXlsx::Document;
 using QXlsx::AbstractSheet;
 using QXlsx::Worksheet;
-using QXlsx::AbstractSheet;
-using QXlsx::CellLocation;
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -72,7 +75,7 @@ void TranslationManager::selectLanguage(int type)
     ClassRegister::GetInstance()->engine()->retranslate();
 }
 
-QCoro::Task<> TranslationManager::translateText(TranslateTitle from, TranslateTitle to)
+QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, TranslateTitle to)
 {
     static QHash<TranslateTitle, QString> languageTextHash = {
         {Translate_French,    "fr"},
@@ -85,17 +88,17 @@ QCoro::Task<> TranslationManager::translateText(TranslateTitle from, TranslateTi
 
     if(!languageTextHash.contains(to) || !languageTextHash.contains(from))
     {
-        co_return;
+        co_return false;
     }
 
     if(to == Translate_Auto) // can not set target language to "auto"
     {
-        co_return;
+        co_return false;
     }
 
     if(from == to) // target language euqals to source language, no need to translate
     {
-        co_return;
+        co_return false;
     }
 
     QString languageFrom = languageTextHash.value(from);
@@ -131,7 +134,7 @@ QCoro::Task<> TranslationManager::translateText(TranslateTitle from, TranslateTi
 
         url.setQuery(query);
 
-        QString result = co_await translateWord(url);
+        QString result = co_await getTranslationByUrl(url);
 
         if(!result.isEmpty())
         {
@@ -141,6 +144,8 @@ QCoro::Task<> TranslationManager::translateText(TranslateTitle from, TranslateTi
         ++iter;
         co_await QCoro::sleepFor(std::chrono::seconds(1));
     }
+
+    co_return true;
 
 }
 
@@ -176,10 +181,13 @@ void TranslationManager::translateExcel(const QUrl &url)
         if(success)
         {
             // use co_await to wait for the translation to finish one by one
-            co_await translateText(Translate_Chinese, Translate_English);
-            co_await translateText(Translate_Chinese, Translate_ChineseTw);
+            bool ret = co_await translateText(Translate_English, Translate_Japanese);
+            //co_await translateText(Translate_Chinese, Translate_ChineseTw);
 
-            writeTrans2Execl(docPath);
+            if(ret)
+            {
+                writeTrans2Execl(docPath);
+            }
         }
     };
 
@@ -212,7 +220,49 @@ QStringList TranslationManager::extractSourceContent(const QString &fileName) {
     return contents;
 }
 
-QCoro::Task<QString> TranslationManager::translateWord(QUrl url)
+QStringList TranslationManager::extractSourceContent(const QString &fileName, const QString &filter)
+{
+    QStringList contents;
+
+    QFile tsFile(fileName);
+    if(!tsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        DEBUGPREFIX << "Failed to open ts file:" << fileName;
+        return QStringList();
+    }
+
+    QDomDocument doc;
+    if(!doc.setContent(&tsFile))
+    {
+        DEBUGPREFIX << "Failed to parse .ts file:" << fileName;
+        tsFile.close();
+        return QStringList();
+    }
+    tsFile.close();
+
+    QDomElement root = doc.documentElement();
+    QDomNodeList messages = root.elementsByTagName("message");
+
+    for(int i = 0; i < messages.count(); ++i)
+    {
+        QDomNode node = messages.at(i);
+        QDomElement sourceElem = node.firstChildElement("source");
+        QDomElement translationElem = node.firstChildElement("translation");
+
+        QString type =  translationElem.attribute("type");
+        if(type == filter)
+        {
+            QString sourceText = sourceElem.text();
+            contents.append(sourceText);
+        }
+    }
+
+    DEBUGPREFIX << "find matched count:" << contents.size();
+
+    return contents;
+}
+
+QCoro::Task<QString> TranslationManager::getTranslationByUrl(QUrl url)
 {
     static QNetworkAccessManager mgr;
     static QNetworkRequest request;
@@ -284,13 +334,13 @@ bool TranslationManager::getTransInfoHash(const QString &excelFilePath)
     int rowCount = currentSheet->dimension().lastRow();
     int columnCount = currentSheet->dimension().lastColumn();
 
-    if(columnCount < TranslationManager::ColumnBegin || rowCount < 1)
+    if(columnCount < ColumnBegin || rowCount < RowBegin)
     {
         DEBUGPREFIX << rowCount << columnCount;
         return false;
     }
 
-    for(int i = TranslationManager::ColumnBegin; i < rowCount + 1; ++i)
+    for(int i = RowBegin; i < rowCount + 1; ++i)
     {
         QString key = currentSheet->read(i, TranslationManager::Translate_Code).toString();
         if(key.isEmpty())
@@ -301,16 +351,52 @@ bool TranslationManager::getTransInfoHash(const QString &excelFilePath)
         QString strZh = currentSheet->read(i, TranslationManager::Translate_Chinese).toString();
         QString strZhTw = currentSheet->read(i, TranslationManager::Translate_ChineseTw).toString();
         QString strEn = currentSheet->read(i, TranslationManager::Translate_English).toString();
+        QString strJa = currentSheet->read(i, TranslationManager::Translate_Japanese).toString();
 
         m_transInfoHash.insert(key,
                                {
                                    {TranslationManager::Translate_Chinese, strZh},
                                    {TranslationManager::Translate_ChineseTw, strZhTw},
-                                   {TranslationManager::Translate_English, strEn}
+                                   {TranslationManager::Translate_English, strEn},
+                                   {TranslationManager::Translate_Japanese, strJa}
                                });
         DEBUGPREFIX << key << strZh << strEn;
     }
     return true;
+}
+
+void TranslationManager::writeCodes2Execl(const QStringList &codes, const QString &excelFilePath)
+{
+    Document xlsx(excelFilePath);
+
+    if(!xlsx.load())
+    {
+        DEBUGPREFIX << "ERROR: fail to load xlsx doc:" << excelFilePath;
+        return;
+    }
+
+    const QStringList& sheetNames = xlsx.sheetNames();
+
+    if(sheetNames.isEmpty())
+    {
+        DEBUGPREFIX << "ERROR: no sheets found in xlsx file";
+        return;
+    }
+
+    Worksheet* currentSheet = reinterpret_cast<Worksheet*>(xlsx.sheet( sheetNames.first()));
+    if ( nullptr == currentSheet )
+    {
+        DEBUGPREFIX << "currentSheet is NULL";
+        return;
+    }
+
+    for(int i = 0; i < codes.size(); ++i)
+    {
+        currentSheet->write(i + 1, Translate_Code, codes.at(i));
+    }
+
+    bool succeed = xlsx.save();
+    DEBUGPREFIX << "Save xlsx:" << succeed;
 }
 
 void TranslationManager::writeTrans2Execl(const QString &excelFilePath)
@@ -342,13 +428,13 @@ void TranslationManager::writeTrans2Execl(const QString &excelFilePath)
     int rowCount = currentSheet->dimension().lastRow();
     int columnCount = currentSheet->dimension().lastColumn();
 
-    if(columnCount < TranslationManager::ColumnBegin || rowCount < 1)
+    if(columnCount < ColumnBegin || rowCount < RowBegin)
     {
         DEBUGPREFIX << rowCount << columnCount;
         return;
     }
 
-    for(int i = TranslationManager::ColumnBegin; i < rowCount + 1; ++i)
+    for(int i = RowBegin; i < rowCount + 1; ++i)
     {
         QString code = currentSheet->read(i, TranslationManager::Translate_Code).toString();
 
