@@ -27,7 +27,7 @@ void FileOperate::transformQMLConnection(const QUrl &url, bool /*recursive*/)
 
     for(int i = 0; i < size; ++i)
     {
-        auto path = pathList.at(i);
+        const QString& path = pathList.at(i);
         QFile file(path);
         if(!file.open(QIODevice::ReadWrite))
         {
@@ -114,10 +114,8 @@ void FileOperate::getAllFiles(QStringList &pathList, const QUrl &url, const QStr
 
     QFileInfoList fileInfoList = dir.entryInfoList(nameFilters, QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
 
-    int size = fileInfoList.size();
-    for(int i = 0; i < size; ++i)
+    for(const auto& fileInfo : fileInfoList)
     {
-        auto fileInfo = fileInfoList.at(i);
         if(fileInfo.isDir())
         {
             getAllFiles(pathList, QUrl::fromLocalFile(fileInfo.absoluteFilePath()), nameFilters, recursive);

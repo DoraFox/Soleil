@@ -104,26 +104,28 @@ QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, Transla
     QString languageFrom = languageTextHash.value(from);
     QString languageTo = languageTextHash.value(to);
 
-    TransInfoHash::iterator iter = m_transInfoHash.begin();
-
-    while (iter != m_transInfoHash.end())
+    for(auto& iter : m_transInfoHash)
     {
-        const QString& translateText = iter.value().value(from);
-        QString& destText = iter.value()[to];
+        const QString& sourceText = iter.value(from);
+        QString& destText = iter[to];
 
-        if(translateText.isEmpty() || !destText.isEmpty())
+        if(sourceText.isEmpty() || !destText.isEmpty())
         {
-            ++iter;
             continue;
         }
 
         QString salt = QString::number(QDateTime::currentMSecsSinceEpoch());
         QString curtime = QString::number(QDateTime::currentSecsSinceEpoch());
-        QString sign = generateSign(translateText, salt, curtime);
+        QString sign = generateSign(sourceText, salt, curtime);
 
-        QUrl url("https://openapi.youdao.com/api");
-        QUrlQuery query;
-        query.addQueryItem("q", translateText);
+        static QUrl url;
+        url.clear();
+        url.setUrl("https://openapi.youdao.com/api");
+
+        static QUrlQuery query;
+        query.clear();
+
+        query.addQueryItem("q", sourceText);
         query.addQueryItem("from", languageFrom);
         query.addQueryItem("to", languageTo);
         query.addQueryItem("appKey", TRANSLATE_APP_KEY);
@@ -141,7 +143,6 @@ QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, Transla
             destText = result;
         }
 
-        ++iter;
         co_await QCoro::sleepFor(std::chrono::seconds(1));
     }
 

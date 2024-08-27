@@ -27,7 +27,7 @@ class LayoutManager : public QObject
     Q_OBJECT
 
 public:
-    typedef enum enumLayoutLevel{
+    typedef enum enumLayoutLevel : quint8{
         FirstLayout,
         SecondLayout,
         ThirdLayout,
@@ -38,7 +38,7 @@ public:
         LayoutCout,
     }LayoutLevel;
 
-    typedef enum enumScreenLevel{
+    typedef enum enumScreenLevel : quint8{
         FirstScreen,
         SecondScreen,
         ThirdScreen,
@@ -49,7 +49,7 @@ public:
         ScreenCount,
     }ScreenLevel;
 
-    typedef enum enumUI{
+    typedef enum enumUI : quint8{
         MainWindow = ((int)FirstLayout * (int)ScreenCount),
         LoginWindow, LeftPane,
 
@@ -113,7 +113,7 @@ public:
     template<UI enumKey>
     bool deleteLayout()
     {
-        constexpr int layoutLevel = enumKey / static_cast<int>(ScreenCount);
+        constexpr int layoutLevel = enumKey / static_cast<quint8>(ScreenCount);
 
         QQuickItem* layoutItem = m_layoutArray[layoutLevel];
 

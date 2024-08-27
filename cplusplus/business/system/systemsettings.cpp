@@ -90,10 +90,10 @@ void SystemSettings::swapMouseButton(bool isLeft)
 bool SystemSettings::isCurrentMouseLeft()
 {
 #ifdef Q_OS_WIN
-    bool flag = SwapMouseButton(false);
+    bool flag = ::SwapMouseButton(false);
     if(flag)
     {
-        SwapMouseButton(true); // restore to right button
+        ::SwapMouseButton(true); // restore to right button
         return false;
     }
     else

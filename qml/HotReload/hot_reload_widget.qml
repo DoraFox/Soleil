@@ -15,10 +15,6 @@ Button_Normal{
 
     text: qsTr("_T1007")
 
-    mouseArea.enabled: false
-
-    signal trigger_hot_reload(var mouse)
-
     Button_Normal{
         implicitWidth: 100 * SizeConst.wFactor
         implicitHeight: implicitWidth
@@ -26,11 +22,9 @@ Button_Normal{
         radius: width / 2
         onClicked: {
             mouse.accepted = false
-            trigger_hot_reload(mouse)
+            Context.trigger_hot_reload(mouse)
         }
     }
-
-    signal btnClicked(var mouse)
 
     Row{
         x: 50 * SizeConst.wFactor
@@ -121,43 +115,6 @@ Button_Normal{
         arcLength: 360 - idArc1.arcLength
         color: ColorConst.getDeepColor()
         //visible: false
-    }
-
-    Loader{
-        id: idLoader
-        active: false
-        sourceComponent: Item{
-            property bool bEnabled: testOpt.enabled
-
-            function onBEnabled() {
-                console.log(StringConst.msg, "bEnabled1111:", bEnabled)
-            }
-
-            Component.onCompleted: {
-                console.log(StringConst.msg, "complete:", testOpt.enabled, bEnabled)
-
-                testOpt.enabledChanged.connect(onBEnabled)
-            }
-        }
-
-        Timer{
-            id: idTimer
-            running: false
-            interval: 1000
-            onTriggered: {
-                idLoader.active = true
-            }
-        }
-    }
-
-    onClicked:{
-        testOpt.enabled = !testOpt.enabled
-        mouse.accepted = false
-        btnClicked(mouse)
-    }
-
-    Component.onCompleted: {
-        idTimer.start()
     }
 
 

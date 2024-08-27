@@ -8,7 +8,6 @@
 #include "business/layout/layoutmanager.h"
 #include "business/network/networkmanager.h"
 
-#include "business/file/exceloperate.h"
 #include "business/system/systemsettings.h"
 #include "business/file/fileoperate.h"
 #include "business/file/textoperate.h"
@@ -34,7 +33,6 @@ ClassRegister::ClassRegister(EnhancedQmlApplicationEngine *engine, QObject *pare
     , m_networkMgr(nullptr)
     , m_mainWindowCtl(nullptr)
     , m_systemSettings(nullptr)
-    , m_excelOpt(nullptr)
     , m_fileOpt(nullptr)
     , m_textOpt(nullptr)
     , m_testOpt(nullptr)
@@ -79,7 +77,6 @@ void ClassRegister::testFunction()
 void ClassRegister::registerClass()
 {
     m_dandelion = new Dandelion(this);
-    m_excelOpt = new ExcelOperate(this);
     m_systemSettings = new SystemSettings(this);
     m_translationMgr = new TranslationManager(this);
     m_networkMgr = new NetworkManager(this);
@@ -115,7 +112,6 @@ void ClassRegister::registerClass()
 void ClassRegister::registerType()
 {
     RegisterQmlType(Dandelion, 1, 0);
-    RegisterQmlType(ExcelOperate, 1, 0);
     RegisterQmlType(SystemSettings, 1, 0);
     RegisterQmlType(TranslationManager, 1, 0);
     //RegisterQmlType(LayoutManager, 1, 0);
@@ -146,7 +142,6 @@ void ClassRegister::registerContext()
 
     ptrContext->setContextProperty("dandelion", m_dandelion);
 
-    ptrContext->setContextProperty("excelOpt", m_excelOpt);
     ptrContext->setContextProperty("funcMgr", m_systemSettings);
     ptrContext->setContextProperty("translationMgr", m_translationMgr);
     ptrContext->setContextProperty("layoutMgr", m_layoutMgr);
@@ -172,7 +167,6 @@ void ClassRegister::registerContext()
 
         PropertyPair("qmlEngine", m_engine),
         PropertyPair("dandelion", m_dandelion),
-        PropertyPair("excelOpt", m_excelOpt),
         PropertyPair("funcMgr", m_systemSettings),
         PropertyPair("translationMgr", m_translationMgr),
         PropertyPair("layoutMgr", m_layoutMgr),

@@ -12,7 +12,6 @@
 
 class Dandelion;
 class SystemSettings;
-class ExcelOperate;
 class TranslationManager;
 class LayoutManager;
 class NetworkManager;
@@ -77,7 +76,6 @@ private:
     DECLARE_PROPERTY(MainWindowControl*, mainWindowCtl)
 
     DECLARE_PROPERTY(SystemSettings*, systemSettings)
-    DECLARE_PROPERTY(ExcelOperate*, excelOpt)
     DECLARE_PROPERTY(FileOperate*, fileOpt)
     DECLARE_PROPERTY(TextOperate*, textOpt)
 
