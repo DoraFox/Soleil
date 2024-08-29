@@ -175,7 +175,6 @@ void ClassRegister::registerContext()
         PropertyPair("textOpt", m_textOpt),
         PropertyPair("networkMgr", m_networkMgr),
         PropertyPair("s19Mgr", m_s19Mgr),
-        PropertyPair("logFileOpt", m_logFileOpt),
     };
 
     ptrContext->setContextProperties(properties);
