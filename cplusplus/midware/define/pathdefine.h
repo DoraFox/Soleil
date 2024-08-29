@@ -16,7 +16,11 @@
 #define TRANSLATION_PATH_EN     TRANSLATION_PATH + CONTACT_STR(EN_NAME, .qm)
 #define TRANSLATION_PATH_EXCEL  TRANSLATION_PATH + _STR(EXCEL_NAME)
 
+#if DYNAMIC_QML_RESOURCE
 #define GET_QML_PATH(name)      APP_DIR_RELATIVE_PATH "../qml/" name
+#else
+#define GET_QML_PATH(name)      QStringLiteral("qrc:/" name)
+#endif
 
 #define APP_ICON_PATH           APP_DIR_PTH + CONTACT_STR(/, IMAGE_RELATIVE_PATH, /)
 #define APP_ICON                APP_ICON_PATH + _STR(APP_ICON_NAME)

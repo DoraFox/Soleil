@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Widget/ColorLabel.qml</file>
+        <file>Widget/ExcelTransform.qml</file>
+        <file>Widget/FileOperate.qml</file>
+        <file>Widget/HotReloadWidget.qml</file>
+        <file>Widget/SwapMouseButton.qml</file>
+        <file>Widget/TextDisplay.qml</file>
+        <file>Widget/TextOperate.qml</file>
+        <file>Widget/TopHint.qml</file>
+        <file>Screen/AscFile.qml</file>
+        <file>Screen/CanWindow.qml</file>
+        <file>Screen/DownloadFile.qml</file>
+        <file>Screen/DtcWindow.qml</file>
+        <file>Screen/LinWindow.qml</file>
+        <file>Screen/LoginWindow.qml</file>
+        <file>Screen/S19Window.qml</file>
+        <file>Screen/ScreenBase.qml</file>
+        <file>Component/Button_HotReload.qml</file>
+        <file>Component/Button_Normal.qml</file>
+        <file>Component/ComboBox_Custom.qml</file>
+        <file>Component/qmldir</file>
+        <file>Context/ColorConst.qml</file>
+        <file>Context/Context.qml</file>
+        <file>Context/FontConst.qml</file>
+        <file>Context/FontIcon.qml</file>
+        <file>Context/qmldir</file>
+        <file>Context/SizeConst.qml</file>
+        <file>Context/StringConst.qml</file>
+        <file>HotReload/hot_reload_widget.qml</file>
+        <file>HotReload/paint_component.qml</file>
+        <file>Layout/InfoMessageBox.qml</file>
+        <file>Layout/LayoutBase.qml</file>
+        <file>Layout/MainWindow.qml</file>
+        <file>Layout/MainWindow2.qml</file>
+        <file>Layout/TopLayout.qml</file>
+    </qresource>
+</RCC>

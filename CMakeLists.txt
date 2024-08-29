@@ -48,6 +48,8 @@ set(MSGPREFIX_STR "Soleil====")
 
 set(APP_ICON_NAME "OHR.SleepingFox_ZH-CN2622967726_UHD.jpg")
 
+set(DYNAMIC_QML_RESOURCE FALSE)
+
 add_compile_definitions(
     PROJECT_NAME=${PROJECT_NAME}
     PROJECT_DIR=${CMAKE_SOURCE_DIR}
@@ -64,6 +66,8 @@ add_compile_definitions(
 
     IMAGE_RELATIVE_PATH=${IMAGE_RELATIVE_PATH}
     APP_ICON_NAME=${APP_ICON_NAME}
+
+    DYNAMIC_QML_RESOURCE=${DYNAMIC_QML_RESOURCE}
 
     GLFW_DLL
 )
@@ -97,15 +101,14 @@ endif()
 
 message(${PROJECT_SOURCES})
 
-file(GLOB_RECURSE QML_SOURCES
-    qml/*.qml
-    qml/qmldir
-)
-
-set(TS_FILES
-    ${TS_PATH}/${ZH_NAME}.ts
-    ${TS_PATH}/${EN_NAME}.ts
-)
+if(DYNAMIC_QML_RESOURCE)
+    file(GLOB_RECURSE QML_SOURCES
+        qml/*.qml
+        qml/qmldir
+    )
+else()
+    set(QML_SOURCES qml/qml.qrc)
+endif()
 
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${TM_PATH}) # set the output files(*.tm) in TM_PATH
 
