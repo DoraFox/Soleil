@@ -10,3 +10,6 @@
 [submodule "3rdparty/Asio"]
 	path = 3rdparty/Asio
 	url = git@github.com:chriskohlhoff/asio.git
+[submodule "3rdparty/glm"]
+	path = 3rdparty/glm
+	url = git@github.com:icaven/glm.git

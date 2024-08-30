@@ -81,7 +81,10 @@ void ClassRegister::registerClass()
     m_translationMgr = new TranslationManager(this);
     m_networkMgr = new NetworkManager(this);
 
-    //m_learnopengl = new LearnOpengl(this);
+#ifdef CPP_OPENGL
+    m_learnopengl = new LearnOpengl(this);
+#endif
+
 #ifdef USE_CAN_LIN
     m_linMgr = new LinManager(this);
     m_canOpt = new CANOperate(this);

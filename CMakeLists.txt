@@ -29,6 +29,7 @@ set(QXLSX_PATH ${CMAKE_SOURCE_DIR}/3rdparty/QXlsx)
 set(DLL_PATH   ${CMAKE_SOURCE_DIR}/dll)
 set(GLAD_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glad)
 set(GLFW_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glfw-3.3.6.bin.WIN64)
+set(GLM_PATH   ${CMAKE_SOURCE_DIR}/3rdparty/glm)
 
 #set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
 set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
@@ -70,6 +71,8 @@ add_compile_definitions(
     DYNAMIC_QML_RESOURCE=${DYNAMIC_QML_RESOURCE}
 
     GLFW_DLL
+    NOT_SHOW_QML
+    CPP_OPENGL
 )
 
 file(GLOB_RECURSE PROJECT_HEADERS
@@ -136,6 +139,7 @@ target_include_directories(Soleil
     #${QXLSX_PATH}/QXlsx/header
     ${GLAD_PATH}/include
     ${GLFW_PATH}/include
+    ${GLM_PATH}
 )
 
 target_link_directories(Soleil

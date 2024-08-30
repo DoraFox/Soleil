@@ -11,8 +11,6 @@
 Q_DECLARE_LOGGING_CATEGORY(testlog)
 Q_LOGGING_CATEGORY(testlog, "testlog")
 
-//#define NOT_SHOW_QML
-
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL); // 解决QML 窗口缩小放大时闪烁的问题
