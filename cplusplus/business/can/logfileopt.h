@@ -60,10 +60,10 @@ private:
     DECLARE_QML_PROPERTY(QString, keyDtcData)
     DECLARE_QML_PROPERTY(QString, keyAdData)
 
-    DECLARE_QML_PROPERTY_READ_ONLY(QStringList, dtcDisplayList)
-    DECLARE_QML_PROPERTY_READ_ONLY(QStringList, dtcDisplayCommentList)
+    DECLARE_PROPERTY_READ_ONLY(QStringList, dtcDisplayList)
+    DECLARE_PROPERTY_READ_ONLY(QStringList, dtcDisplayCommentList)
 
-    DECLARE_QML_PROPERTY_READ_ONLY(QStringList, adDisplayList)
+    DECLARE_PROPERTY_READ_ONLY(QStringList, adDisplayList)
 
 };
 

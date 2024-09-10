@@ -51,17 +51,19 @@ private:
     NetworkOperate* m_networkOpts[DOWNLOAD_THREAD_COUNT];
     QThread* m_downloadTheads[DOWNLOAD_THREAD_COUNT];
 
+    QVector<QString> m_downloadPaths;
+
+    QMutex m_mutex;
+
+    QStringList dirList;
+
     DECLARE_QML_PROPERTY(QString, downloadDirctory)
 
     DECLARE_QML_PROPERTY(int, isDownloading)
 
     DECLARE_QML_PROPERTY(int, downloadState)
 
-    QVector<QString> m_downloadPaths;
 
-    QMutex m_mutex;
-
-    QStringList dirList;
 };
 
 #endif // NETWORKMANAGER_H

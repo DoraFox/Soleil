@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
 
     DEBUGPREFIX << "C++:" << __cplusplus;
 
-    EnhancedQmlApplicationEngine engine;
 #ifdef NOT_SHOW_QML
     ClassRegister classRegister(nullptr);
 #else
+    EnhancedQmlApplicationEngine engine;
     ClassRegister classRegister(&engine);
 #endif
     classRegister.initial();

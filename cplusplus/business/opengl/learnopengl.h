@@ -2,7 +2,6 @@
 #define LEARNOPENGL_H
 
 #include <QObject>
-#include <QtConcurrent>
 
 class LearnOpengl : public QObject
 {
@@ -12,5 +11,6 @@ public:
 
 signals:
 };
+
 
 #endif // LEARNOPENGL_H

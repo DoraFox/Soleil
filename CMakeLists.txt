@@ -122,6 +122,7 @@ set(QCORO_BUILD_EXAMPLES FALSE)
 set(BUILD_TESTING FALSE)
 add_subdirectory(3rdparty/QCoro)
 add_subdirectory(3rdparty/QXlsx/QXlsx)
+add_subdirectory(3rdparty/glm)
 
 add_executable(Soleil
     ${PROJECT_HEADERS}

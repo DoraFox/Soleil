@@ -72,7 +72,7 @@
         }\
     }
 
-#define DECLARE_QML_PROPERTY_READ_ONLY(aType, aProperty)\
+#define DECLARE_PROPERTY_READ_ONLY(aType, aProperty)\
     private: aType m_ ## aProperty;\
     public: aType aProperty() const { return m_ ## aProperty; }
 

@@ -23,6 +23,7 @@
 #endif
 
 #define APP_ICON_PATH           APP_DIR_PTH + CONTACT_STR(/, IMAGE_RELATIVE_PATH, /)
-#define APP_ICON                APP_ICON_PATH + _STR(APP_ICON_NAME)
+#define Get_APP_ICON(name)      APP_ICON_PATH name
+#define APP_ICON                Get_APP_ICON(_STR(APP_ICON_NAME))
 
 #endif // PATHDEFINE_H
