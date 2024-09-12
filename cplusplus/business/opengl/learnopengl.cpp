@@ -59,7 +59,7 @@ static constexpr float gl_aspectRatioArray[] = {
 
 static float gl_fov = 45.0f;
 
-static unsigned char aspectRatioIdx = 0;
+static unsigned char aspectRatioIdx = 2;
 
 static float radius = 10.0f;
 
@@ -73,7 +73,7 @@ inline auto GetProjection(){
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-static glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+static glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  6.0f);
 static glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 static glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
@@ -298,6 +298,8 @@ int drawTextures();
 
 int drawTextures3D();
 
+int drawLight();
+
 void initOpengl(int majorVersion = 3, int minorVersion = 3);
 
 LearnOpengl::LearnOpengl(QObject *parent)
@@ -309,16 +311,7 @@ LearnOpengl::LearnOpengl(QObject *parent)
         QCoreApplication::quit();
     });
 
-    watcher->setFuture(QtConcurrent::run(drawTextures3D));
-
-    char a[10]={0,1,2,3,4,5,6,7};
-    int*p=(int*)a;
-    DEBUGPREFIX << *p;
-    auto cc = *(short int*)(p++);
-    int k = 6;
-    int q =  sizeof(k + 1);
-    DEBUGPREFIX << q << sizeof(k + 1) << cc << *p;
-    DEBUGPREFIX << k;
+    watcher->setFuture(QtConcurrent::run(drawLight));
 }
 
 void initOpengl(int majorVersion, int minorVersion)
@@ -358,10 +351,9 @@ GLFWwindow* CreateWindow(int width, int length, const char* title)
     glfwSetKeyCallback(window, keyCallback);
 #endif
 
-    glfwSetCursorPosCallback(window, mouseCallback);
+//     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetScrollCallback(window, scrollCallback);
-
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+//    glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
     return window;
 }
@@ -1585,7 +1577,7 @@ int drawTextures3D()
 
     unsigned int shaderProgram = shader.shaderProgram();
 
-    glUseProgram(shaderProgram);
+    //glUseProgram(shaderProgram);
 
     glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1);
@@ -1764,3 +1756,219 @@ int drawTextures3D()
 
 }
 
+int drawLight()
+{
+    initOpengl();
+
+    GLFWwindow* window = CreateWindow(800, 600, "drawTextures");
+    if(nullptr == window)
+    {
+        return -1;
+    }
+
+    MoveWindowToCenter(window);
+
+    // 顶点着色器
+    const char* vertexShaderSource =
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+
+        "uniform mat4 model;\n"
+        "uniform mat4 view;\n"
+        "uniform mat4 projection;\n"
+
+        "void main()\n"
+        "{\n"
+        "    gl_Position = projection * view * model * vec4(aPos, 1.0f);\n"
+        "}\n\0";
+
+    // 片段着色器
+    const char* cubeFragmentShaderSource =
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+
+        "uniform vec3 objectColor;\n"
+        "uniform vec3 lightColor;\n"
+
+        "void main()\n"
+        "{\n"
+        "    FragColor = vec4(lightColor * objectColor, 1.0);\n"
+        "}\n\0";
+
+    const char* lightFragmentShaderSource =
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0);\n"
+        "}\n\0";
+
+    Shader lightShader;
+    lightShader.createShaderProgram(vertexShaderSource, lightFragmentShaderSource);
+
+    Shader cubeShader;
+    cubeShader.createShaderProgram(vertexShaderSource, cubeFragmentShaderSource);
+
+    unsigned int lightShaderProgram = lightShader.shaderProgram();
+    unsigned int cubeShaderProgram = cubeShader.shaderProgram();
+
+    //glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
+
+    float vertices[] = {
+        -0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f,  0.5f, -0.5f,
+        0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+
+        -0.5f, -0.5f,  0.5f,
+        0.5f, -0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+
+        0.5f,  0.5f,  0.5f,
+        0.5f,  0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+
+        -0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f,  0.5f,
+        0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f, -0.5f,
+
+        -0.5f,  0.5f, -0.5f,
+        0.5f,  0.5f, -0.5f,
+        0.5f,  0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+    };
+
+    unsigned int VBO = 0;
+    unsigned int cubeVAO = 0;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &VBO);
+
+    // bind the vertex array object first, the bind and set vertex buffer(s), and then configure vertex attributes(s)
+    glBindVertexArray(cubeVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    unsigned int lightVAO = 0;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+
+    // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // uncomment this call to draw in wireframe polygons.
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_FILL or GL_LINE, default mode is GL_FILL
+
+    glEnable(GL_DEPTH_TEST);
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+
+    while (!glfwWindowShouldClose(window))
+    {
+#if !USE_KEY_CALL_BACK
+        // per-frame time logic
+        // --------------------
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        processInput(window);
+#endif
+
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // draw lighting
+        glUseProgram(cubeShaderProgram);
+        glUniform3f(glGetUniformLocation(cubeShaderProgram, "objectColor"), 1.0f, 0.5f, 0.31f);
+        glUniform3f(glGetUniformLocation(cubeShaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
+
+        static const glm::mat4 IdentityMatrix(1.0f);
+
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        int viewLoc = glGetUniformLocation(cubeShaderProgram, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+        int projectionLoc = glGetUniformLocation(cubeShaderProgram, "projection");
+        glm::mat4 projection = GetProjection();
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        glUniform1f(glGetUniformLocation(cubeShaderProgram, "mixValue"), mixValue);
+
+        glm::mat4 model = IdentityMatrix;
+        //model = glm::translate(model, glm::vec3{1, 1, 1});
+        model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f));
+
+        int modelLoc = glGetUniformLocation(cubeShaderProgram, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+        glBindVertexArray(cubeVAO);
+        constexpr int verticesCount = sizeof(vertices) / sizeof(vertices[0]) / 3;
+        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+
+        // draw light cube
+        glUseProgram(lightShaderProgram);
+        glUniform3f(glGetUniformLocation(lightShaderProgram, "objectColor"), 1.0f, 0.5f, 0.31f);
+        glUniform3f(glGetUniformLocation(lightShaderProgram, "lightColor"), 1.0f, 1.0f, 1.0f);
+
+        viewLoc = glGetUniformLocation(lightShaderProgram, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+        projectionLoc = glGetUniformLocation(lightShaderProgram, "projection");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+        model = glm::translate(IdentityMatrix, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        modelLoc = glGetUniformLocation(lightShaderProgram, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+        glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteVertexArrays(1, &lightVAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(cubeShaderProgram);
+    glDeleteProgram(lightShaderProgram);
+
+    glfwTerminate();
+    return 0;
+
+}

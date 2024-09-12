@@ -3,6 +3,7 @@
 
 #include <midware/define/basedefine.h>
 #include <QObject>
+#include <glad/glad.h>
 
 class Shader
 {
@@ -15,6 +16,12 @@ public:
 
     void drawAllTexture();
 
+    // template<typename glUniformFunc>
+    // void setUniformData(unsigned int program, const char* name, ...)
+    // {
+    //     int location = glGetUniformLocation(program, name);
+    //     glUniformFunc(location, ...);
+    // }
 
 private:
 
