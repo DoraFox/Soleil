@@ -10,6 +10,7 @@
 #include <QRegularExpression>
 #include <QDomDocument>
 #include <QFile>
+#include <QFileInfo>
 
 #include <xlsxworkbook.h>
 #include <xlsxdocument.h>
@@ -21,12 +22,22 @@
 #include "register/classregister.h"
 #include <midware/define/pathdefine.h>
 
-const QString TranslationManager::TRANSLATE_APP_KEY = "";
-const QString TranslationManager::TRANSLATE_APP_SECRET = "";
+const QString TranslationManager::TRANSLATE_APP_KEY = "7cc41a4f2bb1c1bf";
+const QString TranslationManager::TRANSLATE_APP_SECRET = "nas7tRjrFj782mrVwHK4WZCRzlglIbRj";
 
 using QXlsx::Document;
 using QXlsx::AbstractSheet;
 using QXlsx::Worksheet;
+
+static QHash<int, QString> languageTextHash = {
+    {TranslationManager::Translate_French,    "fr"},
+    {TranslationManager::Translate_Japanese,  "ja"},
+    {TranslationManager::Translate_Chinese,   "zh-CHS"},
+    {TranslationManager::Translate_ChineseTw, "zh-CHT"},
+    {TranslationManager::Translate_Korean,    "ko"},
+    {TranslationManager::Translate_English,   "en"},
+    {TranslationManager::Translate_Auto,      "auto"},
+    };
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -34,13 +45,44 @@ TranslationManager::TranslationManager(QObject *parent)
 {
     initLanguage();
 
-    // updateTsFileByExecl(R"(D:\Git_project\Soleil\resource\translation\translation.xlsx)",
-    //                     R"(D:\Git_project\Soleil\resource\translation\Soleil_en.ts)",
-    //                     Translate_English);
+    QString src_path = R"(/home/boolping/Git_project/ok-msg-desktop/src/)";
 
-    // updateTsFileByExecl(R"(D:\Git_project\Soleil\resource\translation\translation.xlsx)",
-    //                     R"(D:\Git_project\Soleil\resource\translation\Soleil_zh.ts)",
-    //                     Translate_Chinese);
+    // m_code_list = extractSourceContent(src_path + R"(modules/meet/ts/zh_CN.xml)", "unfinished");
+    // writeCodes2Execl(m_code_list, src_path + R"(modules/meet/ts/translation.xlsx)");
+
+    // m_code_list = extractSourceContent(src_path + R"(UI/window/main/ts/zh_CN.ts)", "unfinished");
+    // writeCodes2Execl(m_code_list, src_path + R"(UI/window/main/ts/translation.xlsx)");
+
+    // m_code_list = extractSourceContent(src_path + R"(UI/window/login/ts/zh_CN.ts)", "unfinished");
+    // writeCodes2Execl(m_code_list, src_path + R"(UI/window/login/ts/translation.xlsx)");
+
+    //extractTranslationContent(R"(/home/boolping/Git_project/ok-msg-desktop/src/modules/im/translations/zh_TW.xml)", Translate_ChineseTw);
+
+
+    auto func = [this](QString ts_path){
+        getTransInfoHash(ts_path + R"(translation.xlsx)");
+        updateTsFileByExecl(ts_path + R"(ja.xml)", Translate_Japanese);
+        updateTsFileByExecl(ts_path + R"(zh_TW.xml)", Translate_ChineseTw);
+        updateTsFileByExecl(ts_path + R"(ko.xml)", Translate_Korean);
+        updateTsFileByExecl(ts_path + R"(zh_CN.xml)", Translate_Chinese);
+    };
+
+    QString ts_path;
+    /*
+    ts_path = src_path + "UI/window/login/ts/";
+    func(ts_path);
+    ts_path = src_path + "UI/window/main/ts/";
+    func(ts_path);
+    ts_path = src_path + "UI/window/config/ts/";
+    func(ts_path);
+    ts_path = src_path + "modules/platform/ts/";
+    func(ts_path);
+    ts_path = src_path + "modules/im/ts/";
+    func(ts_path);
+*/
+    ts_path = src_path + "modules/meet/ts/";
+    func(ts_path);
+
 }
 
 void TranslationManager::selectLanguage(int type)
@@ -52,12 +94,12 @@ void TranslationManager::selectLanguage(int type)
     {
         tmPath = TRANSLATION_PATH_ZH;
     }
-        break;
+    break;
     case Translate_English:
     {
         tmPath = TRANSLATION_PATH_EN;
     }
-        break;
+    break;
     default:
     {
         DEBUGPREFIX << "error type:" << type;
@@ -77,15 +119,6 @@ void TranslationManager::selectLanguage(int type)
 
 QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, TranslateTitle to)
 {
-    static QHash<TranslateTitle, QString> languageTextHash = {
-        {Translate_French,    "fr"},
-        {Translate_Japanese,  "ja"},
-        {Translate_Chinese,   "zh-CHS"},
-        {Translate_ChineseTw, "zh-CHT"},
-        {Translate_English,   "en"},
-        {Translate_Auto,      "auto"},
-    };
-
     if(!languageTextHash.contains(to) || !languageTextHash.contains(from))
     {
         co_return false;
@@ -114,7 +147,9 @@ QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, Transla
             continue;
         }
 
-        QString salt = QString::number(QDateTime::currentMSecsSinceEpoch());
+        qDebug() << "test:" << sourceText << destText;
+
+        QString salt = QUuid::createUuid().toString();//QString::number(QDateTime::currentSecsSinceEpoch());
         QString curtime = QString::number(QDateTime::currentSecsSinceEpoch());
         QString sign = generateSign(sourceText, salt, curtime);
 
@@ -136,12 +171,28 @@ QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, Transla
 
         url.setQuery(query);
 
+        static auto isUtf8 = [](const QString& data){
+            // 尝试将数据解码为 UTF-8
+            QByteArray encoded = data.toUtf8();
+            // 再次编码为 UTF-8，看是否与原始数据一致
+            return encoded == data;
+        };
+
+        DEBUGPREFIX << isUtf8(sourceText);
+
+        if(!isUtf8(sourceText))
+        {
+            continue;
+        }
+
         QString result = co_await getTranslationByUrl(url);
 
         if(!result.isEmpty())
         {
             destText = result;
         }
+
+        qDebug() << __FUNCTION__ << __LINE__ << result;
 
         co_await QCoro::sleepFor(std::chrono::seconds(1));
     }
@@ -195,30 +246,25 @@ void TranslationManager::translateExcel(const QUrl &url)
     innerFunc(url);
 }
 
-QStringList TranslationManager::extractSourceContent(const QString &fileName) {
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Unable to open file:" << fileName;
-        return QStringList();
-    }
+void TranslationManager::translateExcel(const QString &path)
+{
+    static auto innerFunc = [this](QString path)->QCoro::Task<>{
+        QString docPath = path;
+        bool success = getTransInfoHash(docPath);
+        if(success)
+        {
+            // use co_await to wait for the translation to finish one by one
+            bool ret = co_await translateText(Translate_English, Translate_Korean);
+            //co_await translateText(Translate_Chinese, Translate_ChineseTw);
 
-    QTextStream in(&file);
-    QString fileContent = in.readAll();
-    file.close();
+            if(ret)
+            {
+                writeTrans2Execl(docPath);
+            }
+        }
+    };
 
-    // 正则表达式设置为跨行匹配
-    static QRegularExpression regex("<source>(.*?)</source>", QRegularExpression::DotMatchesEverythingOption);
-    QRegularExpressionMatchIterator matches = regex.globalMatch(fileContent);
-
-    QStringList contents;
-    while (matches.hasNext()) {
-        QRegularExpressionMatch match = matches.next();
-        contents.append(match.captured(1)); // 提取第一个捕获组的内容
-    }
-
-    DEBUGPREFIX << "find matched count:" << contents.size();
-
-    return contents;
+    innerFunc(path);
 }
 
 QStringList TranslationManager::extractSourceContent(const QString &fileName, const QString &filter)
@@ -251,10 +297,63 @@ QStringList TranslationManager::extractSourceContent(const QString &fileName, co
         QDomElement translationElem = node.firstChildElement("translation");
 
         QString type =  translationElem.attribute("type");
-        if(type == filter)
+
+        //if(type == filter)
         {
             QString sourceText = sourceElem.text();
-            contents.append(sourceText);
+            QString translationText = translationElem.text();
+            //if(translationText.isEmpty())
+            {
+                contents.append(sourceText);
+            }
+        }
+    }
+
+    DEBUGPREFIX << "find matched count:" << contents.size();
+
+    return contents;
+}
+
+QStringList TranslationManager::extractTranslationContent(const QString &fileName, TranslateTitle language)
+{
+    QStringList contents;
+
+    QFile tsFile(fileName);
+    if(!tsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        DEBUGPREFIX << "Failed to open ts file:" << fileName;
+        return QStringList();
+    }
+
+    QDomDocument doc;
+    if(!doc.setContent(&tsFile))
+    {
+        DEBUGPREFIX << "Failed to parse .ts file:" << fileName;
+        tsFile.close();
+        return QStringList();
+    }
+    tsFile.close();
+
+    QDomElement root = doc.documentElement();
+    QDomNodeList messages = root.elementsByTagName("message");
+
+    for(int i = 0; i < messages.count(); ++i)
+    {
+        QDomNode node = messages.at(i);
+        QDomElement sourceElem = node.firstChildElement("source");
+        QDomElement translationElem = node.firstChildElement("translation");
+
+        QString sourceText = sourceElem.text();
+        QString translationText = translationElem.text();
+
+        TransInfoHash::iterator iter = m_transInfoHash.find(sourceText);
+        if(iter != m_transInfoHash.end())
+        {
+            auto& languageHash = iter.value();
+            if(languageHash[language].isEmpty())
+            {
+                languageHash[language] = translationText;
+            }
         }
     }
 
@@ -349,19 +448,30 @@ bool TranslationManager::getTransInfoHash(const QString &excelFilePath)
             continue;
         }
 
-        QString strZh = currentSheet->read(i, TranslationManager::Translate_Chinese).toString();
-        QString strZhTw = currentSheet->read(i, TranslationManager::Translate_ChineseTw).toString();
-        QString strEn = currentSheet->read(i, TranslationManager::Translate_English).toString();
-        QString strJa = currentSheet->read(i, TranslationManager::Translate_Japanese).toString();
+        QHash<int, QString> dest_hash;
 
-        m_transInfoHash.insert(key,
-                               {
-                                   {TranslationManager::Translate_Chinese, strZh},
-                                   {TranslationManager::Translate_ChineseTw, strZhTw},
-                                   {TranslationManager::Translate_English, strEn},
-                                   {TranslationManager::Translate_Japanese, strJa}
-                               });
-        DEBUGPREFIX << key << strZh << strEn;
+        for(int title = Translate_Code + 1; title < Translate_Auto; ++title )
+        {
+            QString dest = currentSheet->read(i, title).toString();
+            dest_hash.insert(title, dest);
+        }
+
+        if(m_transInfoHash.contains(key) && m_transInfoHash.value(key) == dest_hash)
+        {
+            //DEBUGPREFIX << key << '\n' << m_transInfoHash.value(key) << '\n' << dest_hash;
+        }
+        else
+        {
+            auto iter = std::find_if(m_code_list.begin(), m_code_list.end(), [key](const QString& code){
+                return key == code;
+            });
+            //if(iter != m_code_list.end())
+            {
+                m_transInfoHash.insert(key, std::move(dest_hash));
+            }
+        }
+
+        //DEBUGPREFIX << key << strZh << strEn;
     }
     return true;
 }
@@ -391,9 +501,17 @@ void TranslationManager::writeCodes2Execl(const QStringList &codes, const QStrin
         return;
     }
 
+    currentSheet->write(Title, Translate_Code, "code:");
+
+    for(int i = Translate_Chinese ; i <= Translate_Japanese ; ++i)
+    {
+        currentSheet->write(Title, i, languageTextHash.value(i));
+
+    }
+
     for(int i = 0; i < codes.size(); ++i)
     {
-        currentSheet->write(i + 1, Translate_Code, codes.at(i));
+        currentSheet->write(i + RowBegin, Translate_Code, codes.at(i));
     }
 
     bool succeed = xlsx.save();
@@ -460,17 +578,57 @@ void TranslationManager::writeTrans2Execl(const QString &excelFilePath)
     DEBUGPREFIX << "Save xlsx:" << succeed;
 }
 
-void TranslationManager::updateTsFileByExecl(const QString& excelFilePath, const QString& tsFilePath, TranslateTitle language)
+void insertLineInFile(const QString &tsFilePath, const QString &newLineContent)
 {
-    bool succeed = getTransInfoHash(excelFilePath);
-
-    if(!succeed)
-    {
+    // 打开文件进行读取
+    QFile file(tsFilePath);
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        qDebug() << "Failed to open .ts file:" << tsFilePath;
         return;
     }
 
+    QTextStream inStream(&file);
+
+    // 读取文件所有内容
+    QStringList lines;
+    while (!inStream.atEnd()) {
+        lines.append(inStream.readLine());
+    }
+
+    if(lines.at(1) == "<!--")
+    {
+        file.close();
+        return;
+    }
+
+    // 插入新行到第二行
+    if (lines.size() >= 2) {
+        lines.insert(1, newLineContent); // 插入到第二行
+    } else {
+        lines.append(newLineContent); // 如果文件少于两行，直接添加
+    }
+
+    // 清空文件内容
+    file.resize(0);
+
+    // 使用一个新的 QTextStream 来写入文件
+    QTextStream outStream(&file);
+    outStream.setCodec("UTF-8");
+    outStream.setGenerateByteOrderMark(false);
+
+    // 将修改后的内容写回文件
+    for (const QString &line : lines) {
+        outStream << line << "\n";
+    }
+
+    file.close();
+}
+
+void TranslationManager::updateTsFileByExecl(const QString& tsFilePath, TranslateTitle language)
+{
     // 加载 .ts 文件
     QFile tsFile(tsFilePath);
+    QFileInfo tsFileInfo(tsFile);
     if(!tsFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         DEBUGPREFIX << "Failed to open ts file:" << tsFilePath;
@@ -487,6 +645,9 @@ void TranslationManager::updateTsFileByExecl(const QString& excelFilePath, const
     tsFile.close();
 
     QDomElement root = doc.documentElement();
+
+    root.setAttribute("language", tsFileInfo.baseName());
+
     QDomNodeList messages = root.elementsByTagName("message");
 
     // 更新翻译内容
@@ -499,23 +660,45 @@ void TranslationManager::updateTsFileByExecl(const QString& excelFilePath, const
         QString sourceText = sourceElem.text();
         if (!sourceText.isEmpty() && m_transInfoHash.contains(sourceText))
         {
+            QString newText = m_transInfoHash.value(sourceText).value(language);
+            if(newText.isEmpty())
+            {
+                continue;
+            }
+
             QString type =  translationElem.attribute("type");
             if(type == "unfinished")
             {
                 translationElem.removeAttribute("type");
             }
 
-            QString newText = m_transInfoHash.value(sourceText).value(language);
+            QDomElement numElem = translationElem.firstChildElement("numerusform");
 
-            QDomNode childNode = translationElem.firstChild();
-            if(childNode.nodeValue().isEmpty())
+            if(numElem.isNull()) // 这个子元素不存在
             {
-                QDomText textNode = doc.createTextNode(newText);
-                translationElem.appendChild(textNode);
+                QDomNode childNode = translationElem.firstChild();
+                if(childNode.nodeValue().isEmpty())
+                {
+                    QDomText textNode = doc.createTextNode(newText);
+                    translationElem.appendChild(textNode);
+                }
+                else
+                {
+                    childNode.setNodeValue(newText);
+                }
             }
             else
             {
-                childNode.setNodeValue(newText);
+                QDomNode numNode = numElem.firstChild();
+                if(numNode.nodeValue().isEmpty())
+                {
+                    QDomText textNode = doc.createTextNode(newText);
+                    numElem.appendChild(textNode);
+                }
+                else
+                {
+                    numNode.setNodeValue(newText);
+                }
             }
         }
     }
@@ -529,8 +712,26 @@ void TranslationManager::updateTsFileByExecl(const QString& excelFilePath, const
     }
 
     QTextStream outStream(&outFile);
+    outStream.setCodec("UTF-8"); // 设置编码
+    outStream.setGenerateByteOrderMark(false); // 不生成 BOM
     doc.save(outStream, 4); // 使用缩进级别 4
+
     outFile.close();
+
+    QString comment = R"(<!--
+  ~ Copyright (c) 2022 船山信息 chuanshaninfo.com
+  ~ The project is licensed under Mulan PubL v2.
+  ~ You can use this software according to the terms and conditions of the Mulan
+  ~ PubL v2. You may obtain a copy of Mulan PubL v2 at:
+  ~          http://license.coscl.org.cn/MulanPubL-2.0
+  ~ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+  ~ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+  ~ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+  ~ See the Mulan PubL v2 for more details.
+  -->
+)";
+
+    insertLineInFile(tsFilePath, comment);
 
     DEBUGPREFIX << "Translations updated successfully: " << tsFilePath;
 }
