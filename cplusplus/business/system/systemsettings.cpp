@@ -4,10 +4,6 @@
 #include <QEventLoop>
 #include <QTimer>
 
-#include <Poco/DoubleByteEncoding.h>
-#include <Poco/BasicEvent.h>
-#include <Poco/Delegate.h>
-
 #include "cplusplus/midware/define/basedefine.h"
 
 #ifdef Q_OS_WIN
@@ -15,33 +11,6 @@
 #else
 #include <QProcess>
 #endif
-
-
-using Poco::BasicEvent;
-using Poco::delegate;
-
-class Source
-{
-public:
-    BasicEvent<int> theEvent;
-
-    void fireEvent(int n)
-    {
-        theEvent(this, n);
-    }
-};
-
-
-class Target
-{
-public:
-    void onEvent(const void* /*pSender*/, int& arg)
-    {
-        DEBUGPREFIX << "onEvent: " << arg;
-    }
-};
-
-
 
 SystemSettings::SystemSettings(QObject *parent)
     : QObject{parent}

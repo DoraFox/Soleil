@@ -10,7 +10,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#ifdef Q_OS_WIN32
 #include <minwindef.h>
+#endif
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
@@ -18,13 +21,26 @@
 // #define STB_IMAGE_IMPLEMENTATION
 // #include "stb_image.h"
 
+#ifdef Q_OS_WIN
 
 extern "C" {
-    // specify the Nvidia to render
-    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-    // specify the AMD to render
-    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+// specify the Nvidia to render
+__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+// specify the AMD to render
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
+
+#elif defined(Q_OS_LINUX)
+
+extern "C" {
+// specify the Nvidia to render
+__attribute__((visibility("default"))) unsigned int NvOptimusEnablement = 0x00000001;
+// specify the AMD to render
+__attribute__((visibility("default"))) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
+#endif
+
 
 // 顶点数组对象：Vertex Array Object，VAO
 // 顶点缓冲对象：Vertex Buffer Object，VBO
@@ -1310,11 +1326,12 @@ int drawTextures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    /*
     int width = 0;
     int height = 0;
     int nrChannels = 0;
     QByteArray iconPath = (APP_ICON).toUtf8();
-/*
+
     stbi_set_flip_vertically_on_load(true); // 加载图片时翻转y轴
     unsigned char *data = stbi_load(iconPath.data(), &width, &height, &nrChannels, 0);
     if(data)
@@ -1443,7 +1460,7 @@ int drawTextures()
     {
         glClearColor(0.4f, 0.7f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-/*
+        /*
         // 在绑定纹理之前先激活纹理单元(纹理单元GL_TEXTURE0默认总是被激活)
         glActiveTexture(GL_TEXTURE0);
         // 激活纹理单元之后，接下来的glBindTexture函数调用会绑定这个纹理到当前激活的纹理单元

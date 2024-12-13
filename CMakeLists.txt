@@ -20,7 +20,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 find_package(QT NAMES Qt5 REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus Xml)
 
-set(POCO_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/Poco)
 set(CPP_PATH   ${CMAKE_SOURCE_DIR}/cplusplus)
 set(QML_PATH   ${CMAKE_SOURCE_DIR}/qml)
 set(ASIO_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/Asio)
@@ -28,7 +27,7 @@ set(QCORO_PATH ${CMAKE_SOURCE_DIR}/3rdparty/QCoro)
 set(QXLSX_PATH ${CMAKE_SOURCE_DIR}/3rdparty/QXlsx)
 set(DLL_PATH   ${CMAKE_SOURCE_DIR}/dll)
 set(GLAD_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glad)
-set(GLFW_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glfw-3.3.6.bin.WIN64)
+set(GLFW_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glfw)
 set(GLM_PATH   ${CMAKE_SOURCE_DIR}/3rdparty/glm)
 
 #set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
@@ -49,7 +48,7 @@ set(MSGPREFIX_STR "Soleil====")
 
 set(APP_ICON_NAME "OHR.SleepingFox_ZH-CN2622967726_UHD.jpg")
 
-set(DYNAMIC_QML_RESOURCE FALSE)
+set(DYNAMIC_QML_RESOURCE 1)
 
 add_compile_definitions(
     PROJECT_NAME=${PROJECT_NAME}
@@ -70,9 +69,8 @@ add_compile_definitions(
 
     DYNAMIC_QML_RESOURCE=${DYNAMIC_QML_RESOURCE}
 
-    GLFW_DLL
-    NOT_SHOW_QML
-    CPP_OPENGL
+    # NOT_SHOW_QML
+    # CPP_OPENGL
 )
 
 file(GLOB_RECURSE PROJECT_HEADERS
@@ -123,6 +121,7 @@ set(BUILD_TESTING FALSE)
 add_subdirectory(3rdparty/QCoro)
 add_subdirectory(3rdparty/QXlsx/QXlsx)
 add_subdirectory(3rdparty/glm)
+add_subdirectory(3rdparty/glfw)
 
 add_executable(Soleil
     ${PROJECT_HEADERS}
@@ -134,7 +133,6 @@ add_executable(Soleil
 target_include_directories(Soleil
     PUBLIC
     ${CPP_PATH}
-    ${POCO_PATH}/header
     ${ASIO_PATH}/include
     ${QCORO_PATH}/qcoro
     #${QXLSX_PATH}/QXlsx/header
@@ -145,11 +143,9 @@ target_include_directories(Soleil
 
 target_link_directories(Soleil
     PUBLIC
-    ${POCO_PATH}/lib
     #${QXLSX_PATH}/lib
     ${DLL_PATH}/x64
     ${CMAKE_BINARY_DIR}/dll/x64
-    ${GLFW_PATH}/lib-mingw-w64
 )
 
 if(WIN32)
@@ -159,7 +155,6 @@ if(WIN32)
         -lws2_32
         -lUser32
         -lwinmm
-        -lglfw3dll
     )
 endif()
 
@@ -173,12 +168,12 @@ endif()
 
 target_link_libraries(Soleil
     PUBLIC
-    -lPocoFoundation
     #-lQXlsx
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Xml
     QCoro${QT_VERSION_MAJOR}Core
     QCoro${QT_VERSION_MAJOR}Network
+    glfw
 
     PRIVATE
     -static-libgcc
