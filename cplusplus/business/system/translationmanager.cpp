@@ -81,7 +81,7 @@ TranslationManager::TranslationManager(QObject *parent)
     func(ts_path);
 */
     ts_path = src_path + "modules/meet/ts/";
-    func(ts_path);
+    //func(ts_path);
 
 }
 

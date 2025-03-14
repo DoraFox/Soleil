@@ -60,6 +60,14 @@ char Dandelion::convertU82Char(uint8_t value)
     }
 }
 
+QString Dandelion::timestampToDateTime(qint64 timestamp) {
+    // 将时间戳转换为 QDateTime
+    QDateTime dateTime = QDateTime::fromSecsSinceEpoch(timestamp);
+
+    // 格式化输出为 "yyyy-MM-dd HH:mm:ss"
+    return dateTime.toString("yyyy-MM-dd HH:mm:ss");
+}
+
 QColor Dandelion::getLightColor()
 {
     static const double min = 0;

@@ -10,6 +10,7 @@ QtObject {
         Blue,
         Pink,
         HotPink,
+        Black,
         Count
     }
 
@@ -36,6 +37,7 @@ QtObject {
         colorArray[ColorConst.Color.Blue] = "Blue"
         colorArray[ColorConst.Color.Pink] = "Pink"
         colorArray[ColorConst.Color.HotPink] = "HotPink"
+        colorArray[ColorConst.Color.Black] = "Black"
     }
 
 }

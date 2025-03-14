@@ -48,6 +48,7 @@ void LayoutManager::initLayout()
     //createUI<UI::LoginWindow>();
     createUI<UI::System>();
     createUI<UI::InfoMessageBox>();
+    createUI<UI::SubMenu>();
 
     emit finishInit();
 }
@@ -56,7 +57,7 @@ void LayoutManager::deleteAllLayout()
 {
     deleteLayout<MainWindow>();
     deleteLayout<System>();
-    //deleteLayout<Task>();
+    deleteLayout<Task>();
 }
 
 void LayoutManager::onQMLObjectCreated(QObject *obj, const QUrl &objUrl)

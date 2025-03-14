@@ -17,6 +17,8 @@
 #include "business/calibration/ccpcalibration.h"
 #include "business/opengl/learnopengl.h"
 
+#include "business/crawler/crawlercontroller.h"
+
 #ifdef USE_CAN_LIN
 #include "business/lin/linmanager.h"
 #include "business/can/canoperate.h"
@@ -39,6 +41,7 @@ ClassRegister::ClassRegister(EnhancedQmlApplicationEngine *engine, QObject *pare
     , m_ccpCal(nullptr)
     , m_s19Mgr(nullptr)
     , m_learnopengl(nullptr)
+    , m_crawlerController(nullptr)
 #ifdef USE_CAN_LIN
     , m_canOpt(nullptr)
     , m_linMgr(nullptr)
@@ -99,6 +102,8 @@ void ClassRegister::registerClass()
     m_ccpCal = new CCPCalibration(this);
     m_s19Mgr = new S19Manager(this);
 
+    m_crawlerController = new CrawlerController(this);
+
     if(m_engine)
     {
         m_layoutMgr = new LayoutManager(m_engine, this);
@@ -155,7 +160,7 @@ void ClassRegister::registerContext()
     ptrContext->setContextProperty("testOpt", m_testOpt);
     ptrContext->setContextProperty("networkMgr", m_networkMgr);
     ptrContext->setContextProperty("s19Mgr", m_s19Mgr);
-
+    ptrContext->setContextProperty("crawlerController", m_crawlerController);
 
 #ifdef USE_CAN_LIN
     ptrContext->setContextProperty("linMgr", m_linMgr);

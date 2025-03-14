@@ -18,7 +18,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 # add_feature_info(Examples QCORO_BUILD_EXAMPLES "Build examples")
 
 find_package(QT NAMES Qt5 REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus Xml)
+find_package(Qt5 REQUIRED COMPONENTS Concurrent Core Quick Sql LinguistTools Svg SerialBus Xml WebSockets)
 
 set(CPP_PATH   ${CMAKE_SOURCE_DIR}/cplusplus)
 set(QML_PATH   ${CMAKE_SOURCE_DIR}/qml)
@@ -173,6 +173,7 @@ target_link_libraries(Soleil
     Qt${QT_VERSION_MAJOR}::Xml
     QCoro${QT_VERSION_MAJOR}Core
     QCoro${QT_VERSION_MAJOR}Network
+    QCoro${QT_VERSION_MAJOR}WebSockets
     glfw
 
     PRIVATE
@@ -184,6 +185,7 @@ target_link_libraries(Soleil
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Svg
     Qt${QT_VERSION_MAJOR}::SerialBus
+    Qt${QT_VERSION_MAJOR}::WebSockets
 )
 
 target_compile_options(Soleil

@@ -25,6 +25,8 @@ class CCPCalibration;
 
 class LearnOpengl;
 
+class CrawlerController;
+
 #ifdef USE_CAN_LIN
 class LinManager;
 class CANOperate;
@@ -85,6 +87,8 @@ private:
     DECLARE_PROPERTY(S19Manager*, s19Mgr)
 
     DECLARE_PROPERTY(LearnOpengl*, learnopengl)
+
+    DECLARE_PROPERTY(CrawlerController*, crawlerController)
 
 #ifdef USE_CAN_LIN
     DECLARE_PROPERTY(LinManager*, linMgr)

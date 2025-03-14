@@ -4,13 +4,16 @@
 #include <QEventLoop>
 #include <QTimer>
 
-#include "cplusplus/midware/define/basedefine.h"
-
 #ifdef Q_OS_WIN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <winuser.h>
 #else
 #include <QProcess>
 #endif
+
+#include "cplusplus/midware/define/basedefine.h"
+
 
 SystemSettings::SystemSettings(QObject *parent)
     : QObject{parent}

@@ -54,6 +54,7 @@ public:
         LoginWindow, LeftPane,
 
         Task = ((int)SecondLayout * (int)ScreenCount),
+        SubMenu,
 
         ToolBar = ((int)ThirdLayout * (int)ScreenCount),
 
@@ -293,6 +294,19 @@ template<>
 inline QQuickItem* LayoutManager::createScreen<LayoutManager::InfoMessageBox>(QQuickItem* ptrLayout)
 {
     QQuickItem* screenItem = createBaseScreen(LayoutManager::InfoMessageBox, GET_QML_PATH("Layout/InfoMessageBox.qml"));
+    if(screenItem)
+    {
+        screenItem->setVisible(false);
+        screenItem->setParent(ptrLayout);
+        screenItem->setParentItem(ptrLayout);
+    }
+    return screenItem;
+}
+
+template<>
+inline QQuickItem* LayoutManager::createScreen<LayoutManager::SubMenu>(QQuickItem* ptrLayout)
+{
+    QQuickItem* screenItem = createBaseScreen(LayoutManager::SubMenu, GET_QML_PATH("Layout/SubMenu.qml"));
     if(screenItem)
     {
         screenItem->setVisible(false);

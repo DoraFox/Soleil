@@ -6,4 +6,6 @@ QtObject {
     signal trigger_hot_reload(var mouse)
 
     signal showInfoMessageBox(var text)
+
+    signal showCommentWindow()
 }

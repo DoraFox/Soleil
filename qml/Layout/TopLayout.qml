@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Context 1.0
 
 import Component 1.0
@@ -6,7 +6,7 @@ import Component 1.0
 // path
 import "../Widget"
 
-Item{
+LayoutBase{
     id: root
     anchors.fill: parent
 

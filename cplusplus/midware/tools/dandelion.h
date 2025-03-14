@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QColor>
+#include <QDateTime>
 
 class Dandelion : public QObject
 {
@@ -19,6 +20,9 @@ public:
     Q_INVOKABLE QString getDirectoryAbsolutePath(QString path);
 
     char convertU82Char(uint8_t value);
+
+    Q_INVOKABLE QString timestampToDateTime(qint64 timestamp);
+
 
 
 public slots:

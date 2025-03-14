@@ -7,6 +7,7 @@ QtObject {
     property real hFactor: SizeConst.hFactor
 
     property int fontSize_8:  8 * hFactor
+    property int fontSize_12: 12 * hFactor
     property int fontSize_16: 16 * hFactor
     property int fontSize_24: 24 * hFactor
     property int fontSize_32: 32 * hFactor
