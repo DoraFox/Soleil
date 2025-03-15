@@ -193,10 +193,9 @@ private:
 
         do{
             constexpr int layoutLevel = enumKey / static_cast<int>(ScreenCount);
-            UI layoutUi = static_cast<UI>(layoutLevel * ScreenCount);
-            if(nullptr != m_layoutArray[layoutUi])
+            if(nullptr != m_layoutArray[layoutLevel])
             {
-                layoutItem = m_layoutArray[layoutUi];
+                layoutItem = m_layoutArray[layoutLevel];
                 break;
             }
 
