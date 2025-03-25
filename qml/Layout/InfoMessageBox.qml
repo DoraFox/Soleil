@@ -11,22 +11,41 @@ MouseArea {
     id: root
     anchors.fill: parent
 
+    property var callBack: null
+
     Rectangle{
         anchors.centerIn: parent
-        width: 200
-        height: 100
-        border.color: "green"
+        width: SizeConst.dialogWidth
+        height: SizeConst.dialogHeight
 
-        Dialog {
-            id: idDialog
+        color: "#CCFFFFFF"
+        border.color: "grey"
+
+        Text {
+            id: idInfoText
             anchors.centerIn: parent
-            width: 180
-            height: 90
-            title: "Title"
-            standardButtons: Dialog.Ok | Dialog.Cancel
+            font.pixelSize: FontConst.normalSize
 
-            onAccepted: console.log("Ok clicked")
-            onRejected: console.log("Cancel clicked")
+        }
+
+        Button{
+            anchors{
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom
+                bottomMargin: 30 * SizeConst.hFactor
+            }
+
+            width: 150 * SizeConst.wFactor
+            height: 50 * SizeConst.hFactor
+            text: "确认"
+
+            onClicked: {
+                root.visible = false
+                if(callBack)
+                {
+                    callBack()
+                }
+            }
         }
     }
 
@@ -37,11 +56,11 @@ MouseArea {
     Connections{
         target: Context
 
-        function onShowInfoMessageBox(text)
+        function onShowInfoMessageBox(text, callBack)
         {
+            idInfoText.text = text
             root.visible = true
-            idDialog.title = text
-            console.log("sss", text)
+            root.callBack = callBack
         }
     }
 

@@ -6,6 +6,7 @@
 #include <QWebSocket>
 
 #include <QCoro/websockets/qcorowebsockets.h>
+#include <midware/define/basedefine.h>
 
 #include "awememodel.h"
 #include "commentmodel.h"
@@ -14,8 +15,14 @@ using QCoroWebSocket = QCoro::detail::QCoroWebSocket;
 
 class CrawlerController : public QObject {
     Q_OBJECT
+
+    Q_PROPERTY(QAbstractSocket::SocketState socketState MEMBER m_socketState NOTIFY socketStateChanged)
+    Q_PROPERTY(QProcess::ProcessState pythonState MEMBER m_pythonState NOTIFY pythonStateChanged)
+
 public:
+
     explicit CrawlerController(QObject *parent = nullptr);
+    ~CrawlerController();
 
     Q_INVOKABLE QCoro::Task<bool> startPython();
 
@@ -27,8 +34,11 @@ public:
 
     Q_INVOKABLE void sendPrivateMessage(QString msg, QString sec_uid);
 
+    //Q_INVOKABLE void setConfig();
+
 signals:
-    void dataReceived(QString keyword, int index, QString data);
+    DECLARE_PROPERTY_SIGNAL(QAbstractSocket::SocketState, socketState)
+    DECLARE_PROPERTY_SIGNAL(QProcess::ProcessState, pythonState)
 
 private slots:
     void onConnected();
@@ -36,18 +46,24 @@ private slots:
     void onDisconnected();
     void onPythonFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
-    void onStateChanged(QAbstractSocket::SocketState state);
+    void readStandardOutput();
+
+    void readStandardError();
 
 private:
     void sendTextMessage(const QJsonObject& command);
+    bool checkWebSocketConnected();
 
 private:
-    QProcess* pythonProcess;
-    QWebSocket* webSocket;
-    QCoroWebSocket coroWebSocket;
+    QProcess* m_pythonProcess;
+    QWebSocket* m_webSocket;
+    QCoroWebSocket m_coroWebSocket;
 
-    AwemeModel* awemeModel;
-    CommentModel* commentModel;
+    AwemeModel* m_awemeModel;
+    CommentModel* m_commentModel;
+
+    DECLARE_QML_PROPERTY(QAbstractSocket::SocketState, socketState)
+    DECLARE_QML_PROPERTY(QProcess::ProcessState, pythonState)
 };
 
 #endif // CRAWLERCONTROLLER_H

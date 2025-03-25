@@ -30,8 +30,9 @@ set(GLAD_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glad)
 set(GLFW_PATH  ${CMAKE_SOURCE_DIR}/3rdparty/glfw)
 set(GLM_PATH   ${CMAKE_SOURCE_DIR}/3rdparty/glm)
 
-#set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
 set(QML_IMPORT_PATH ${QML_PATH} ${CPP_PATH} CACHE STRING "" FORCE)
+
+message("QML_IMPORT_PATH" ${QML_IMPORT_PATH})
 
 set(ZH_NAME ${PROJECT_NAME}_zh)
 set(EN_NAME ${PROJECT_NAME}_en)
@@ -197,7 +198,7 @@ target_compile_options(Soleil
 )
 
 set_target_properties(Soleil PROPERTIES
-    WIN32_EXECUTABLE TRUE  #set TRUE for not show console window
+    WIN32_EXECUTABLE FALSE  #set TRUE for not show console window
 )
 
 install(TARGETS Soleil

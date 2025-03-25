@@ -1,4 +1,5 @@
 #include "dandelion.h"
+#include <midware/define/pathdefine.h>
 
 #include <random>
 #include <QDir>
@@ -66,6 +67,11 @@ QString Dandelion::timestampToDateTime(qint64 timestamp) {
 
     // 格式化输出为 "yyyy-MM-dd HH:mm:ss"
     return dateTime.toString("yyyy-MM-dd HH:mm:ss");
+}
+
+QString Dandelion::getAppDirectoryPath()
+{
+    return APP_DIR_PTH;
 }
 
 QColor Dandelion::getLightColor()

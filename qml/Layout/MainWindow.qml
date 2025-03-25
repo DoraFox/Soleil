@@ -15,61 +15,51 @@ import "../Screen"
 LayoutBase{
     anchors.fill: parent
 
-    SwipeView{
-        id: idView
+    // HotReloadWidget{
+
+    // }
+
+    CrawlerWindow{
+
+        onShowCommentWindow: {
+            idCommentWindow.active = true
+        }
+
+        onShowCrawlerSettingWindow: {
+            idCrawlerSettingWindow.active = true
+        }
+
+    }
+
+    Loader{
+        id: idCommentWindow
+
         anchors.fill: parent
 
-        HotReloadWidget{
+        active: false
 
-        }
-
-        CrawlerWindow{
-
-        }
-
-        AscFile{
-
-        }
-
-        DownloadFile{
-
-        }
-
-        TextOperate{
-
-        }
-
-        FileOperate{
-
-        }
-
-        ExcelTransform{
-
-        }
-
-        SwapMouseButton{
-
-        }
-
-        TextDisplay{
-
+        sourceComponent: CommentWindow {
+            onCloseWindow: {
+                idCommentWindow.active = false
+            }
         }
     }
 
-    PageIndicator {
-         id: idIndicator
 
-         interactive: true
-         count: idView.count
-         currentIndex: idView.currentIndex
+    Loader{
+        id: idCrawlerSettingWindow
 
-         anchors.bottom: idView.bottom
-         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.fill: parent
 
-         onCurrentIndexChanged: {
-             idView.currentIndex = currentIndex
-         }
+        active: false
+
+        sourceComponent: CrawlerSettingWindow {
+            onCloseWindow: {
+                idCrawlerSettingWindow.active = false
+            }
+        }
     }
+
 }
 
 

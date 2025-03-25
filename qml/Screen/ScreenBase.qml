@@ -7,8 +7,16 @@ Rectangle {
     property real hFactor: SizeConst.hFactor
     property real rFactor: SizeConst.rFactor
 
-    implicitWidth: 600 * wFactor
-    implicitHeight: 400 * hFactor
+    property alias mouseArea: idMouseArea
+
+    implicitWidth: SizeConst.windowWidth * wFactor
+    implicitHeight: SizeConst.windowHeight * hFactor
 
     color: ColorConst.colorArray[ColorConst.Color.LightBlue]
+
+    MouseArea {
+        id: idMouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+    }
 }

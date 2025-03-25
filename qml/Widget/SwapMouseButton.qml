@@ -36,13 +36,13 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        isMouseLeft = funcMgr.isCurrentMouseLeft()
+        isMouseLeft = systemSettings.isCurrentMouseLeft()
     }
 
     function changeMouseButton(isLeft)
     {
         isMouseLeft = isLeft
-        funcMgr.swapMouseButton(isLeft)
+        systemSettings.swapMouseButton(isLeft)
     }
 
     Column{

@@ -7,6 +7,9 @@ QtObject {
     property real hFactor: 1
     property real rFactor: hFactor
 
-    property int windowWidth: 600
-    property int windowHeight: 400
+    readonly property int windowWidth: 1200
+    readonly property int windowHeight: 800
+
+    readonly property int dialogWidth: windowWidth / 2
+    readonly property int dialogHeight: windowHeight / 2
 }

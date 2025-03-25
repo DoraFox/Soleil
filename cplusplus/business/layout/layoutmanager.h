@@ -190,28 +190,26 @@ private:
     template<UI enumKey>
     QQuickItem* createLayout()
     {
-        QQuickItem* layoutItem = nullptr;
+        constexpr int layoutLevel = enumKey / static_cast<int>(ScreenCount);
+        if(m_layoutArray[layoutLevel])
+        {
+            return m_layoutArray[layoutLevel];
+        }
 
-        do{
-            constexpr int layoutLevel = enumKey / static_cast<int>(ScreenCount);
-            if(nullptr != m_layoutArray[layoutLevel])
-            {
-                layoutItem = m_layoutArray[layoutLevel];
-                break;
-            }
+        QQuickItem* layoutItem = createBaseLayout();
 
-            layoutItem = createBaseLayout();
+        if(!layoutItem)
+        {
+            DEBUGPREFIX << "Failed to create base layout:" << layoutLevel;
+            return nullptr;
+        }
 
-            if(!layoutItem){ break; }
+        layoutItem->setZ(layoutLevel);
 
-            layoutItem->setZ(layoutLevel);
+        m_layoutArray[layoutLevel] = layoutItem;
 
-            m_layoutArray[layoutLevel] = layoutItem;
-
-            DEBUGPREFIX << "UI:" << QMetaEnum::fromType<UI>().valueToKey(enumKey) << '\n'
-                        << layoutItem;
-
-        }while(0);
+        DEBUGPREFIX << "UI:" << QMetaEnum::fromType<UI>().valueToKey(enumKey) << '\n'
+                    << layoutItem;
 
         return layoutItem;
     }

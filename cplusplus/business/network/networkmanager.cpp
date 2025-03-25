@@ -70,8 +70,8 @@ task test() {
 
 NetworkManager::NetworkManager(QObject *parent)
     : QObject{parent}
-    , m_downloadTheads{Q_NULLPTR, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR}
     , m_networkOpts{Q_NULLPTR, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR}
+    , m_downloadTheads{Q_NULLPTR, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR}
 {
 //    asio::io_context io_context;
 //    asio::ip::tcp::socket socket(io_context);

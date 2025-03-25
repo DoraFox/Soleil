@@ -19,10 +19,10 @@ class NetworkManager : public QObject
     Q_PROPERTY(int downloadState MEMBER m_downloadState NOTIFY downloadStateChanged)
 
 public:
-    typedef enum enumDownloadState{
+    enum enumDownloadState{
         DownloadState_StartDownload,
         DownloadState_DownloadFinished,
-    }enumDownloadState;
+    };
     Q_ENUM(enumDownloadState)
 
     explicit NetworkManager(QObject *parent = nullptr);

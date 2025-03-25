@@ -1,7 +1,9 @@
 #include "crawlercontroller.h"
 
 #include <midware/define/basedefine.h>
+#include <midware/define/pathdefine.h>
 #include "register/classregister.h"
+#include <midware/tools/dandelion.h>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -11,82 +13,162 @@
 
 CrawlerController::CrawlerController(QObject *parent)
     : QObject(parent)
-    , pythonProcess(nullptr)
-    , webSocket(nullptr)
-    , coroWebSocket(nullptr)
-    , awemeModel(nullptr)
-    , commentModel(nullptr)
+    , m_pythonProcess(nullptr)
+    , m_webSocket(nullptr)
+    , m_coroWebSocket(nullptr)
+    , m_awemeModel(nullptr)
+    , m_commentModel(nullptr)
 {
-    pythonProcess = new QProcess(this);
-    connect(pythonProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    m_pythonProcess = new QProcess(this);
+
+    connect(m_pythonProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, &CrawlerController::onPythonFinished);
 
-    webSocket = new QWebSocket();
-    coroWebSocket = qCoro(webSocket);
+    // 连接信号到槽函数，以便捕获输出
+    //connect(m_pythonProcess, &QProcess::readyReadStandardOutput, this, &CrawlerController::readStandardOutput);
+    //connect(m_pythonProcess, &QProcess::readyReadStandardError, this, &CrawlerController::readStandardError);
 
-    connect(webSocket, &QWebSocket::connected, this, &CrawlerController::onConnected);
-    connect(webSocket, &QWebSocket::textMessageReceived, this, &CrawlerController::onMessageReceived);
-    connect(webSocket, &QWebSocket::disconnected, this, &CrawlerController::onDisconnected);
-    connect(webSocket, &QWebSocket::stateChanged, this, &CrawlerController::onStateChanged);
+    set_pythonState(m_pythonProcess->state());
+    connect(m_pythonProcess, &QProcess::stateChanged, this, [this](QProcess::ProcessState state){
+        DEBUGPREFIX << "set_pythonState:" << Dandelion::enumToString(state);
+        set_pythonState(state);
+    });
 
-    awemeModel = new AwemeModel(this);
-    commentModel = new CommentModel(this);
+    m_webSocket = new QWebSocket();
+    m_coroWebSocket = qCoro(m_webSocket);
+
+    set_socketState(m_webSocket->state());
+
+    connect(m_webSocket, &QWebSocket::connected, this, &CrawlerController::onConnected);
+    connect(m_webSocket, &QWebSocket::textMessageReceived, this, &CrawlerController::onMessageReceived);
+    connect(m_webSocket, &QWebSocket::disconnected, this, &CrawlerController::onDisconnected);
+    connect(m_webSocket, &QWebSocket::stateChanged, this, [this](QAbstractSocket::SocketState state){
+        DEBUGPREFIX << "set_socketState:" << Dandelion::enumToString(state);
+        set_socketState(state);
+    });
+
+    m_awemeModel = new AwemeModel(this);
+    m_commentModel = new CommentModel(this);
+
+    m_awemeModel->init();
+    m_commentModel->loadCommentsFromDatabase(m_awemeModel->getAwemesId());
+
+    connect(m_awemeModel, &AwemeModel::deletedAweme, m_commentModel, &CommentModel::onDeletedAweme);
 
     QQmlContext* ptrContext = ClassRegister::GetInstance()->engine()->rootContext();
-    ptrContext->setContextProperty("commentModel", commentModel);
-    ptrContext->setContextProperty("awemeModel", awemeModel);
+    ptrContext->setContextProperty("awemeModel", m_awemeModel);
+    ptrContext->setContextProperty("commentModel", m_commentModel);
+
+    RegisterQmlType(CommentModel, 1, 0);
+}
+
+CrawlerController::~CrawlerController()
+{
+    DEBUGPREFIX << "EXIT";
+
+    m_webSocket->close();
+    m_webSocket->deleteLater();
+    m_webSocket = nullptr;
+
+    m_pythonProcess->deleteLater();
+    m_pythonProcess = nullptr;
+
+    m_awemeModel->deleteLater();
+    m_awemeModel = nullptr;
+    m_commentModel->deleteLater();
+    m_commentModel = nullptr;
 }
 
 QCoro::Task<bool> CrawlerController::startPython()
 {
-    if (pythonProcess->state() == QProcess::NotRunning) {
-        QString pythonPath = "C:/Users/BoolPing/AppData/Local/Programs/Python/Python39/python.exe";  // 确保 Python 在 PATH 中
+#ifdef QT_DEBUG
+    if (m_pythonProcess->state() == QProcess::NotRunning) {
+        QString pythonPath = "D:/QtCreatorProjects/pyqt/.venv/Scripts/python.exe";  // 确保 Python 在 PATH 中
         QString scriptPath = "D:/QtCreatorProjects/pyqt/main.py";  // Python 爬虫路径
 
-        pythonProcess->start(pythonPath, QStringList() << scriptPath);
-        if (!pythonProcess->waitForStarted()) {
-            qDebug() << "爬虫启动失败" << pythonProcess->error();
+        DEBUGPREFIX << pythonPath << scriptPath;
+
+        m_pythonProcess->start(pythonPath, QStringList() << scriptPath);
+        if (!m_pythonProcess->waitForStarted()) {
+            qDebug() << "爬虫启动失败" << m_pythonProcess->error();
             co_return false;
         }
         qDebug() << "Python 爬虫已启动";
     }
 
     co_return true;
+
+#else
+    if (m_pythonProcess->state() == QProcess::NotRunning)
+    {
+        QString programPath = APP_DIR_PTH + "/python/crawler.exe";  // 确保 Python 在 PATH 中
+
+        DEBUGPREFIX << "programPath:" << programPath;
+
+        // 设置要运行的程序
+        m_pythonProcess->setProgram(programPath);
+
+        // 启动程序
+        m_pythonProcess->start();
+
+        // 检查是否启动成功
+        if (m_pythonProcess->waitForStarted())
+        {
+            DEBUGPREFIX << "Program started successfully.";
+            co_return true;
+        }
+        else
+        {
+            DEBUGPREFIX << "Failed to start the program.";
+            co_return false;
+        }
+    }
+
+    co_return true;
+#endif
 }
 
 bool CrawlerController::launchEdge()
 {
     static auto innerFunc = [this]()->QCoro::Task<bool>{
-        // bool result = co_await startPython();
-        // if(!result)
-        // {
-        //     DEBUGPREFIX << "start pthon successful";
-        //     co_return false;
-        // }
-        // else
-        // {
-        //     DEBUGPREFIX << "start pthon failed";
-        // }
+        bool result = co_await startPython();
+        if(result)
+        {
+            DEBUGPREFIX << "start pthon successful";
+        }
+        else
+        {
+            DEBUGPREFIX << "start pthon failed";
+            co_return false;
+        }
 
         bool connected = co_await connectPthon();
         DEBUGPREFIX << "connected:" << connected;
 
-        QJsonObject command;
-        command["command"] = "launch_edge";
+        if(checkWebSocketConnected())
+        {
+            QJsonObject command;
+            command["command"] = "launch_edge";
 
-        sendTextMessage(command);
+            sendTextMessage(command);
+            co_return true;
+        }
+        else
+        {
+            co_return false;
+        }
 
-        co_return true;
     };
+
     innerFunc();
     return true;
 }
 
 QCoro::Task<bool> CrawlerController::connectPthon()
 {
-    if (webSocket->state() != QAbstractSocket::ConnectedState)
+    if (m_webSocket->state() != QAbstractSocket::ConnectedState)
     {
-        co_return co_await coroWebSocket.open(QUrl("ws://localhost:8765"), std::chrono::milliseconds(10000));
+        co_return co_await m_coroWebSocket.open(QUrl("ws://localhost:8765"), std::chrono::milliseconds(10000));
     }
     else
     {
@@ -105,7 +187,7 @@ void CrawlerController::startCrawler(QString keyword)
 
 void CrawlerController::stopCrawler()
 {
-    if (webSocket->state() != QAbstractSocket::ConnectedState) {
+    if (m_webSocket->state() != QAbstractSocket::ConnectedState) {
         DEBUGPREFIX << "WebSocket already is unconnected";
         return;
     }
@@ -114,8 +196,8 @@ void CrawlerController::stopCrawler()
     command["command"] = "stop";
     sendTextMessage(command);
 
-    // if (pythonProcess->state() != QProcess::NotRunning) {
-    //     pythonProcess->terminate();
+    // if (m_pythonProcess->state() != QProcess::NotRunning) {
+    //     m_pythonProcess->terminate();
     // }
 
     DEBUGPREFIX << "WebSocket disconnected";
@@ -133,12 +215,12 @@ void CrawlerController::sendPrivateMessage(QString msg, QString sec_uid)
 
 void CrawlerController::onConnected()
 {
-    qDebug() << "WebSocket connected";
+    DEBUGPREFIX << "WebSocket connected";
 }
 
 void CrawlerController::onDisconnected()
 {
-    qDebug() << "WebSocket disconnected";
+    DEBUGPREFIX << "WebSocket disconnected";
 }
 
 void CrawlerController::onMessageReceived(QString message)
@@ -152,11 +234,11 @@ void CrawlerController::onMessageReceived(QString message)
     {
         if(obj["msg_type"].toString() == "aweme")
         {
-            awemeModel->append(obj);
+            m_awemeModel->append(obj);
         }
         else if(obj["msg_type"].toString() == "comment")
         {
-            commentModel->append(obj);
+            m_commentModel->append(obj);
         }
 
 
@@ -168,17 +250,44 @@ void CrawlerController::onMessageReceived(QString message)
 
 void CrawlerController::onPythonFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "Python exit，code:" << exitCode << exitStatus;
+    DEBUGPREFIX << "Python exit，code:" << exitCode << exitStatus;
 }
 
-void CrawlerController::onStateChanged(QAbstractSocket::SocketState state)
+void CrawlerController::readStandardOutput()
 {
-    DEBUGPREFIX << state;
+    QProcess *process = qobject_cast<QProcess *>(sender());
+    if (process) {
+        QByteArray output = process->readAllStandardOutput();
+        QString decodedOutput = QString::fromLocal8Bit(output); // 将字节流解码为 UTF-8 字符串
+        DEBUGPREFIX << "stdout:" << decodedOutput;
+    }
+}
+
+void CrawlerController::readStandardError()
+{
+    QProcess *process = qobject_cast<QProcess *>(sender());
+    if (process) {
+        QByteArray errorOutput = process->readAllStandardError();
+        QString decodedOutput = QString::fromLocal8Bit(errorOutput); // 将字节流解码为 UTF-8 字符串
+        DEBUGPREFIX << "stderr:" << decodedOutput;
+    }
 }
 
 void CrawlerController::sendTextMessage(const QJsonObject &command)
 {
-    qint64 bytes = webSocket->sendTextMessage(QJsonDocument(command).toJson(QJsonDocument::Compact));
+    qint64 bytes = m_webSocket->sendTextMessage(QJsonDocument(command).toJson(QJsonDocument::Compact));
 
     DEBUGPREFIX << "sendTextMessage" << bytes << command;
+}
+
+bool CrawlerController::checkWebSocketConnected()
+{
+    auto state = m_webSocket->state();
+    if(state != QAbstractSocket::SocketState::ConnectedState)
+    {
+        DEBUGPREFIX << m_webSocket->error() << m_webSocket->errorString();
+        return false;
+    }
+    return true;
+
 }

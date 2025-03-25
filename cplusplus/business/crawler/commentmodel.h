@@ -4,9 +4,13 @@
 #include <QAbstractListModel>
 #include <QVector>
 #include <QJsonObject>
+#include <QSet>
+#include <QHash>
 
 #include "register/classregister.h"
 #include <midware/tools/dandelion.h>
+
+class SQLiteManager;
 
 class CommentModel : public QAbstractListModel {
     Q_OBJECT
@@ -29,8 +33,8 @@ public:
         QString parentCommentId;
         QString pictures;
         bool hadSentMessage;
+        bool deleted;
     };
-
 
     enum CommentRoles {
         CommentIdRole = Qt::UserRole + 1,
@@ -49,143 +53,47 @@ public:
         LikeCountRole,
         ParentCommentIdRole,
         PicturesRole,
-        HadSentMessageRole
+        HadSentMessageRole,
+        DeletedRole
     };
 
-    explicit CommentModel(QObject *parent = nullptr) : QAbstractListModel(parent) {}
+    Q_ENUM(CommentRoles)
+
+    explicit CommentModel(QObject *parent = nullptr);
 
     // 获取数据行数
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override {
-        Q_UNUSED(parent);
-        return m_comments.size();
-    }
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     // 角色名称映射
-    QHash<int, QByteArray> roleNames() const override {
-        static const QHash<int, QByteArray> roles = {
-            {CommentIdRole, "comment_id"},
-            {CreateTimeRole, "create_time"},
-            {IpLocationRole, "ip_location"},
-            {AwemeIdRole, "aweme_id"},
-            {ContentRole, "content"},
-            {UserIdRole, "user_id"},
-            {SecUidRole, "sec_uid"},
-            {ShortUserIdRole, "short_user_id"},
-            {UserUniqueIdRole, "user_unique_id"},
-            {UserSignatureRole, "user_signature"},
-            {NicknameRole, "nickname"},
-            {AvatarRole, "avatar"},
-            {SubCommentCountRole, "sub_comment_count"},
-            {LikeCountRole, "like_count"},
-            {ParentCommentIdRole, "parent_comment_id"},
-            {PicturesRole, "pictures"},
-            {HadSentMessageRole,"hadSentMessage"}
-        };
-        return roles;
-    }
+    QHash<int, QByteArray> roleNames() const override;
 
     // 获取数据
-    QVariant data(const QModelIndex &index, int role) const override {
-        if (!index.isValid() || index.row() >= m_comments.size())
-            return QVariant();
+    QVariant data(const QModelIndex &index, int role) const override;
 
-        const CommentItem &comment = m_comments.at(index.row());
-
-        switch (role) {
-        case CommentIdRole:
-            return comment.commentId;
-        case CreateTimeRole:
-            return comment.createTime;
-        case IpLocationRole:
-            return comment.ipLocation;
-        case AwemeIdRole:
-            return comment.awemeId;
-        case ContentRole:
-            return comment.content;
-        case UserIdRole:
-            return comment.userId;
-        case SecUidRole:
-            return comment.secUid;
-        case ShortUserIdRole:
-            return comment.shortUserId;
-        case UserUniqueIdRole:
-            return comment.userUniqueId;
-        case UserSignatureRole:
-            return comment.userSignature;
-        case NicknameRole:
-            return comment.nickname;
-        case AvatarRole:
-            return comment.avatar;
-        case SubCommentCountRole:
-            return comment.subCommentCount;
-        case LikeCountRole:
-            return comment.likeCount;
-        case ParentCommentIdRole:
-            return comment.parentCommentId;
-        case PicturesRole:
-            return comment.pictures;
-        case HadSentMessageRole:
-            return comment.hadSentMessage;
-        }
-        return QVariant();
-    }
+    // 设置数据
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     // 添加评论数据
-    void append(const QJsonObject &json) {
-        static Dandelion* tool = ClassRegister::GetInstance()->dandelion();
+    void append(const QJsonObject &json);
 
-        CommentItem comment;
-        comment.commentId = json.value("comment_id").toString();
-        comment.createTime =  tool->timestampToDateTime(json["create_time"].toDouble());
-        comment.ipLocation = json.value("ip_location").toString();
-        comment.awemeId = json.value("aweme_id").toString();
-        comment.content = json.value("content").toString();
-        comment.userId = json.value("user_id").toString();
-        comment.secUid = json.value("sec_uid").toString();
-        comment.shortUserId = json.value("short_user_id").toString();
-        comment.userUniqueId = json.value("user_unique_id").toString();
-        comment.userSignature = json.value("user_signature").toString();
-        comment.nickname = json.value("nickname").toString();
-        comment.avatar = json.value("avatar").toString();
-        comment.subCommentCount = json.value("sub_comment_count").toInt();
-        comment.likeCount = json.value("like_count").toInt();
-        comment.parentCommentId = json.value("parent_comment_id").toString();
-        comment.hadSentMessage = false;
+    void appendCurrentAwemeComment(CommentItem comment);
 
-        m_awemeComments[comment.awemeId].append(comment);
+    Q_INVOKABLE void setCurrentAwemeComment(QString awemeId);
 
-        // 如果当前显示的 aweme_id 正好是这个，则更新数据
-        if (comment.awemeId == m_currentAwemeId) {
-            appendCurrentAwemeComment(std::move(comment));
-        }
-    }
+    void loadCommentsFromDatabase(const QSet<QString> &awemesId);
 
-    void appendCurrentAwemeComment(CommentItem&& comment)
-    {
-        beginInsertRows(QModelIndex(), m_comments.size(), m_comments.size());
-        m_comments.append(std::move(comment));
-        endInsertRows();
-    }
+    Q_INVOKABLE void deleteCurrentAwemeComment();
 
-    Q_INVOKABLE void setCurrentAwemeComment(QString awemeId)
-    {
-        DEBUGPREFIX << awemeId << m_currentAwemeId;
-
-        if (m_currentAwemeId == awemeId) return;
-
-        beginResetModel();
-        m_currentAwemeId = awemeId;
-        m_comments = m_awemeComments[awemeId];
-        endResetModel();
-    }
+public slots:
+    void onDeletedAweme(QString awemeId);
 
 private:
     QVector<CommentItem> m_comments;
-
+    QSet<QString> m_commentsId;
     QHash<QString, QVector<CommentItem>> m_awemeComments;
-
     QString m_currentAwemeId;
-};
 
+    SQLiteManager* m_sqlManager;
+};
 
 #endif // COMMENTMODEL_H

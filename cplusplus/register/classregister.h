@@ -26,6 +26,7 @@ class CCPCalibration;
 class LearnOpengl;
 
 class CrawlerController;
+class SQLiteManager;
 
 #ifdef USE_CAN_LIN
 class LinManager;
@@ -89,6 +90,7 @@ private:
     DECLARE_PROPERTY(LearnOpengl*, learnopengl)
 
     DECLARE_PROPERTY(CrawlerController*, crawlerController)
+    DECLARE_PROPERTY(SQLiteManager*, sqliteManager)
 
 #ifdef USE_CAN_LIN
     DECLARE_PROPERTY(LinManager*, linMgr)

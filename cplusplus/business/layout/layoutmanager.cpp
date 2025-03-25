@@ -57,7 +57,9 @@ void LayoutManager::deleteAllLayout()
 {
     deleteLayout<MainWindow>();
     deleteLayout<System>();
+    deleteLayout<UI::InfoMessageBox>();
     deleteLayout<Task>();
+
 }
 
 void LayoutManager::onQMLObjectCreated(QObject *obj, const QUrl &objUrl)

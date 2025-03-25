@@ -6,7 +6,7 @@ import Context 1.0
 Loader {
     id: idLoader
 
-    source: "../HotReload/hot_reload_widget.qml"
+    source: "../Screen/CrawlerWindow.qml"
 
 
     function reload()

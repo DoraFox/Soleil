@@ -56,7 +56,6 @@
         m_ ## aProperty = _ ## aProperty;\
     }
 
-
 #define DECLARE_PROPERTY_SIGNAL(aType, aProperty)\
     void aProperty ## Changed(aType _ ## aProperty);
 
@@ -79,6 +78,8 @@
 #define RegisterQmlType(aType, versionMaj, versionMin)\
     qmlRegisterType<aType>(#aType, versionMaj, versionMin, #aType)
 
+#define RegisterQmlUncreatableType(aType, versionMaj, versionMin)\
+    qmlRegisterUncreatableType<aType>(#aType, versionMaj, versionMin, #aType, "Cannot instantiate QAbstractSocket, use only for enums.")
 
 /* This will return the last argument */
 #define RegisterQmlComponentType(...) _CONTACT(RegisterQmlComponentType_, NARGS(__VA_ARGS__))(__VA_ARGS__)

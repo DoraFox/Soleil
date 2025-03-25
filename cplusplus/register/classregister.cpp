@@ -19,6 +19,8 @@
 
 #include "business/crawler/crawlercontroller.h"
 
+#include "business/database/sqlitemanager.h"
+
 #ifdef USE_CAN_LIN
 #include "business/lin/linmanager.h"
 #include "business/can/canoperate.h"
@@ -42,6 +44,7 @@ ClassRegister::ClassRegister(EnhancedQmlApplicationEngine *engine, QObject *pare
     , m_s19Mgr(nullptr)
     , m_learnopengl(nullptr)
     , m_crawlerController(nullptr)
+    ,m_sqliteManager(nullptr)
 #ifdef USE_CAN_LIN
     , m_canOpt(nullptr)
     , m_linMgr(nullptr)
@@ -102,6 +105,7 @@ void ClassRegister::registerClass()
     m_ccpCal = new CCPCalibration(this);
     m_s19Mgr = new S19Manager(this);
 
+    m_sqliteManager = new SQLiteManager(this);
     m_crawlerController = new CrawlerController(this);
 
     if(m_engine)
@@ -125,6 +129,8 @@ void ClassRegister::registerType()
     //RegisterQmlType(LayoutManager, 1, 0);
     RegisterQmlType(NetworkOperate, 1, 0);
     RegisterQmlType(NetworkManager, 1, 0);
+    RegisterQmlUncreatableType(QAbstractSocket, 1, 0);
+
 
 #ifdef USE_CAN_LIN
     RegisterQmlType(LogFileOpt, 1, 0);
@@ -150,7 +156,7 @@ void ClassRegister::registerContext()
 
     ptrContext->setContextProperty("dandelion", m_dandelion);
 
-    ptrContext->setContextProperty("funcMgr", m_systemSettings);
+    ptrContext->setContextProperty("systemSettings", m_systemSettings);
     ptrContext->setContextProperty("translationMgr", m_translationMgr);
     ptrContext->setContextProperty("layoutMgr", m_layoutMgr);
 
@@ -175,7 +181,7 @@ void ClassRegister::registerContext()
 
         PropertyPair("qmlEngine", m_engine),
         PropertyPair("dandelion", m_dandelion),
-        PropertyPair("funcMgr", m_systemSettings),
+        PropertyPair("systemSettings", m_systemSettings),
         PropertyPair("translationMgr", m_translationMgr),
         PropertyPair("layoutMgr", m_layoutMgr),
         PropertyPair("mainWindowCtl", m_mainWindowCtl),
@@ -183,6 +189,7 @@ void ClassRegister::registerContext()
         PropertyPair("textOpt", m_textOpt),
         PropertyPair("networkMgr", m_networkMgr),
         PropertyPair("s19Mgr", m_s19Mgr),
+        PropertyPair("crawlerController", m_crawlerController),
     };
 
     ptrContext->setContextProperties(properties);

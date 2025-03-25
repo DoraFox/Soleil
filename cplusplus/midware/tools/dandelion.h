@@ -1,6 +1,7 @@
 #ifndef DANDELION_H
 #define DANDELION_H
 
+#include <QMetaEnum>
 #include <QObject>
 #include <QColor>
 #include <QDateTime>
@@ -23,6 +24,12 @@ public:
 
     Q_INVOKABLE QString timestampToDateTime(qint64 timestamp);
 
+    template<typename T>
+    static QString enumToString(T value) {
+        return QMetaEnum::fromType<T>().valueToKey(value);
+    }
+
+    Q_INVOKABLE QString getAppDirectoryPath();
 
 
 public slots:

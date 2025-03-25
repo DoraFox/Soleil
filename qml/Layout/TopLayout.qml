@@ -28,7 +28,8 @@ LayoutBase{
         }
     }
 
-    Button_HotReload{
+
+    /*Button_HotReload{
         id: idBtn_hotreload
         x: parent.width - width
         y: (parent.height - height) / 2
@@ -44,6 +45,5 @@ LayoutBase{
                 maximumY: root.height - idBtn_hotreload.height
             }
         }
-
-    }
+    }*/
 }
