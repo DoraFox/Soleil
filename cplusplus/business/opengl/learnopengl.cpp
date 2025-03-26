@@ -11,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #include <minwindef.h>
 #endif
 

@@ -46,6 +46,7 @@ TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
     , m_translator(new QTranslator(this))
 {
+/*
     initLanguage();
 
     QString src_path = R"(/home/boolping/Git_project/ok-msg-desktop/src/)";
@@ -71,7 +72,7 @@ TranslationManager::TranslationManager(QObject *parent)
     };
 
     QString ts_path;
-    /*
+
     ts_path = src_path + "UI/window/login/ts/";
     func(ts_path);
     ts_path = src_path + "UI/window/main/ts/";
@@ -82,10 +83,10 @@ TranslationManager::TranslationManager(QObject *parent)
     func(ts_path);
     ts_path = src_path + "modules/im/ts/";
     func(ts_path);
-*/
+
     ts_path = src_path + "modules/meet/ts/";
     func(ts_path);
-
+*/
 }
 
 void TranslationManager::selectLanguage(int type)
