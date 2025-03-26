@@ -7,7 +7,7 @@
 #include "cplusplus/midware/define/basedefine.h"
 
 #ifdef Q_OS_WIN
-#include <winuser.h>
+#include <windows.h>
 #else
 #include <QProcess>
 #endif
