@@ -29,15 +29,18 @@ using QXlsx::Document;
 using QXlsx::AbstractSheet;
 using QXlsx::Worksheet;
 
-static QHash<int, QString> languageTextHash = {
-    {TranslationManager::Translate_French,    "fr"},
-    {TranslationManager::Translate_Japanese,  "ja"},
-    {TranslationManager::Translate_Chinese,   "zh-CHS"},
-    {TranslationManager::Translate_ChineseTw, "zh-CHT"},
-    {TranslationManager::Translate_Korean,    "ko"},
-    {TranslationManager::Translate_English,   "en"},
-    {TranslationManager::Translate_Auto,      "auto"},
-    };
+// 定义全局静态 QHash
+typedef QHash<int, QString> LanguageHash;
+Q_GLOBAL_STATIC_WITH_ARGS(LanguageHash, languageTextHash,
+                          ({
+                            {TranslationManager::Translate_French,    "fr"},
+                            {TranslationManager::Translate_Japanese,  "ja"},
+                            {TranslationManager::Translate_Chinese,   "zh-CHS"},
+                            {TranslationManager::Translate_ChineseTw, "zh-CHT"},
+                            {TranslationManager::Translate_Korean,    "ko"},
+                            {TranslationManager::Translate_English,   "en"},
+                            {TranslationManager::Translate_Auto,      "auto"},
+                            }))
 
 TranslationManager::TranslationManager(QObject *parent)
     : QObject(parent)
@@ -119,7 +122,7 @@ void TranslationManager::selectLanguage(int type)
 
 QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, TranslateTitle to)
 {
-    if(!languageTextHash.contains(to) || !languageTextHash.contains(from))
+    if(!languageTextHash()->contains(to) || !languageTextHash->contains(from))
     {
         co_return false;
     }
@@ -134,8 +137,8 @@ QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, Transla
         co_return false;
     }
 
-    QString languageFrom = languageTextHash.value(from);
-    QString languageTo = languageTextHash.value(to);
+    QString languageFrom = languageTextHash->value(from);
+    QString languageTo = languageTextHash->value(to);
 
     for(auto& iter : m_transInfoHash)
     {
@@ -269,6 +272,8 @@ void TranslationManager::translateExcel(const QString &path)
 
 QStringList TranslationManager::extractSourceContent(const QString &fileName, const QString &filter)
 {
+    Q_UNUSED(filter)
+
     QStringList contents;
 
     QFile tsFile(fileName);
@@ -462,9 +467,9 @@ bool TranslationManager::getTransInfoHash(const QString &excelFilePath)
         }
         else
         {
-            auto iter = std::find_if(m_code_list.begin(), m_code_list.end(), [key](const QString& code){
-                return key == code;
-            });
+            // auto iter = std::find_if(m_code_list.begin(), m_code_list.end(), [key](const QString& code){
+            //     return key == code;
+            // });
             //if(iter != m_code_list.end())
             {
                 m_transInfoHash.insert(key, std::move(dest_hash));
@@ -505,7 +510,7 @@ void TranslationManager::writeCodes2Execl(const QStringList &codes, const QStrin
 
     for(int i = Translate_Chinese ; i <= Translate_Japanese ; ++i)
     {
-        currentSheet->write(Title, i, languageTextHash.value(i));
+        currentSheet->write(Title, i, languageTextHash->value(i));
 
     }
 
