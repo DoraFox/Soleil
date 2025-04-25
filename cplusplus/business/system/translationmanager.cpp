@@ -207,7 +207,7 @@ QCoro::Task<bool> TranslationManager::translateText(TranslateTitle from, Transla
 void TranslationManager::initLanguage()
 {
     QString locale = QLocale::system().name();
-    QString fileName = CONTACT_STR(PROJECT_NAME, _) + locale.split('_').first();
+    QString fileName = CONTACT_STR_2(PROJECT_NAME, _) + locale.split('_').first();
     QString fileDir = TRANSLATION_PATH;
     bool flag = m_translator->load(fileName, fileDir);
     if(flag)

@@ -128,7 +128,7 @@ void TestOperate::definedFunc()
 
     DEBUGPREFIX << __FUNCTION__
                 << __func__
-                << __PRETTY_FUNCTION__
+                //<< __PRETTY_FUNCTION__
                 << __FILE__
                 << __LINE__
         ;

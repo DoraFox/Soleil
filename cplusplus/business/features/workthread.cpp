@@ -3,10 +3,13 @@
 #include <midware/define/basedefine.h>
 
 #ifdef Q_OS_WIN
-#include <profileapi.h>
-#include <synchapi.h>
-#include <winnt.h>
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+
 #include <winsock2.h>
+#include <windows.h>
+#include <synchapi.h>
+#include <profileapi.h>
 #endif
 
 #include <chrono>
@@ -107,8 +110,8 @@ void WorkThread::run() {
         timer.setInterval(1);
         connect(&timer, &QTimer::timeout, [&](){
             std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
-            system_clock::duration tp = start.time_since_epoch();
-            milliseconds ms  = duration_cast<milliseconds>(tp);
+            auto tp = start.time_since_epoch();  // 自动推导类型
+            auto ms = duration_cast<milliseconds>(tp);  // 显式转换
             DEBUGPREFIX << ms.count();
         });
         timer.setTimerType(Qt::PreciseTimer);

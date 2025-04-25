@@ -81,7 +81,7 @@
 
 
 /* This will return the last argument */
-#define RegisterQmlComponentType(...) _CONTACT(RegisterQmlComponentType_, NARGS(__VA_ARGS__))(__VA_ARGS__)
+//#define RegisterQmlComponentType(...) _CONTACT(RegisterQmlComponentType_, NARGS(__VA_ARGS__))(__VA_ARGS__)
 
 #define RegisterQmlComponentType_3(aType, versionMaj, versionMin)\
     qmlRegisterType<aType>("cplusplus.Component", versionMaj, versionMin, #aType)
@@ -91,5 +91,34 @@
 
 
 #define TestMacro(str) "cplusplus" _STR(str)
+
+
+
+#include <QtQml>
+#include <type_traits>
+
+// 主模板声明（无需实现，仅用于 SFINAE）
+template <typename... Args>
+void RegisterQmlComponentType(Args&&... args);
+
+// 3 参数版本（aType, versionMaj, versionMin）
+template <typename T, typename VersionMaj, typename VersionMin>
+void RegisterQmlComponentType(T, VersionMaj versionMaj, VersionMin versionMin) {
+    static_assert(std::is_integral_v<VersionMaj> && std::is_integral_v<VersionMin>,
+                  "Version numbers must be integers");
+    qmlRegisterType<T>("cplusplus.Component", versionMaj, versionMin, STR(T));
+}
+
+// 4 参数版本（aType, uri, versionMaj, versionMin）
+template <typename T, typename Uri, typename VersionMaj, typename VersionMin>
+void RegisterQmlComponentType(T, Uri uri, VersionMaj versionMaj, VersionMin versionMin) {
+    static_assert(std::is_convertible_v<Uri, const char*>, "URI must be a string");
+    static_assert(std::is_integral_v<VersionMaj> && std::is_integral_v<VersionMin>,
+                  "Version numbers must be integers");
+    qmlRegisterType<T>(uri, versionMaj, versionMin, STR(T));
+}
+
+
+
 
 #endif // BASEDEFINE_H

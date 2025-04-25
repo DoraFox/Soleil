@@ -12,7 +12,11 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
+if(MSVC)
+    #set_property(TARGET Soleil PROPERTY CXX_STANDARD 20)
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
+endif()
 
 # option(QCORO_BUILD_EXAMPLES "Build examples" ON)
 # add_feature_info(Examples QCORO_BUILD_EXAMPLES "Build examples")
@@ -186,12 +190,18 @@ target_link_libraries(Soleil
     Qt${QT_VERSION_MAJOR}::SerialBus
 )
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)  # 检查是否是 64 位系统
+    target_compile_definitions(Soleil PRIVATE _AMD64_)
+else()
+    target_compile_definitions(Soleil PRIVATE _X86_)  # 32 位系统
+endif()
+
 target_compile_options(Soleil
     PUBLIC
     -DASIO_STANDALONE
-    -Wall
-    -W
-    -g
+    # -Wall
+    # -W
+    # -g
 )
 
 set_target_properties(Soleil PROPERTIES

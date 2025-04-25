@@ -30,7 +30,7 @@ Button_Normal{
         x: 50 * SizeConst.wFactor
         y: 50 * SizeConst.hFactor
         spacing: 10 * SizeConst.wFactor
-
+/*
         Torus{
             id: idTorus
 
@@ -54,32 +54,34 @@ Button_Normal{
                 property: "arcLength"
             }
         }
+*/
 
-        Canvas{
-            antialiasing: true
 
-            width: 58 * SizeConst.wFactor
-            height: width
+    }
 
-            onWidthChanged: {
-                requestPaint()
-            }
+    Canvas{
+        antialiasing: true
 
-            onHeightChanged: {
-                requestPaint()
-            }
+        width: 58 * SizeConst.wFactor
+        height: width
 
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.lineWidth = 3 * SizeConst.hFactor
-                ctx.strokeStyle = "#F57C64"
-
-                ctx.clearRect(0, 0, width, height)
-                ctx.arc(width / 2, height / 2, (width - ctx.lineWidth) / 2, 0, 2 * Math.PI, false)
-                ctx.stroke()
-            }
+        onWidthChanged: {
+            requestPaint()
         }
 
+        onHeightChanged: {
+            requestPaint()
+        }
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.lineWidth = 3 * SizeConst.hFactor
+            ctx.strokeStyle = "#F57C64"
+
+            ctx.clearRect(0, 0, width, height)
+            ctx.arc(width / 2, height / 2, (width - ctx.lineWidth) / 2, 0, 2 * Math.PI, false)
+            ctx.stroke()
+        }
     }
 
     Arc{
@@ -104,7 +106,7 @@ Button_Normal{
         }
 
     }
-
+/*
     Arc{
         id: idArc2
         anchors.centerIn: parent
@@ -116,7 +118,7 @@ Button_Normal{
         color: ColorConst.getDeepColor()
         //visible: false
     }
-
+*/
 
 
 }
